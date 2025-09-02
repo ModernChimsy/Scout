@@ -1,0 +1,171 @@
+{
+  "Welcome to TARMEEM!": "مرحبا بك في ترميم!",
+  "Join As": "انضم كـ",
+  "User": "مستخدم",
+  "Service Provider": "مزود الخدمة",
+  "Sign in": "تسجيل الدخول",
+  "Sign In": "تسجيل الدخول",
+  "Email": "البريد الإلكتروني",
+  "Password": "كلمة المرور",
+  "Forget Password?": "نسيت كلمة المرور؟",
+  "Or continue with": "أو تابع مع",
+  "Arabic": "العربية",
+  "English": "الإنجليزية",
+  "Don’t have any account?": "ليس لديك أي حساب؟",
+  "Sign Up": "اشتراك",
+
+
+  "Category": "الفئة",
+  "Recommend Services": "خدمات موصى بها",
+  "Welcome": "مرحباً",
+  "Search here...": "ابحث هنا...",
+  "Location": "الموقع",
+  "Message": "رسالة",
+  "Profile": "الملف الشخصي",
+  "Personal Information": "المعلومات الشخصية",
+  "Settings": "الإعدادات",
+  "Log Out": "تسجيل الخروج",
+  "Want to Logout account !": "هل تريد تسجيل الخروج من الحساب؟",
+  "Please confirm to Logout button to logout your account.": "يرجى تأكيد زر تسجيل الخروج لتسجيل الخروج من حسابك.",
+  "Confirm": "تأكيد",
+  "Cancel": "إلغاء",
+  "Ongoing Quotation": "اقتباس جاري",
+  "Hire Request Send": "تم إرسال طلب التوظيف",
+
+
+
+
+  "Edit Profile": "تعديل الملف الشخصي",
+  "History": "السجل",
+  "Service Details": "تفاصيل الخدمة",
+  "Location": "الموقع",
+  "Contact": "الاتصال",
+  "Price Type": "نوع السعر",
+  "Duration": "المدة",
+  "Complete": "اكتمل",
+  "Descriptions:": "الوصف:",
+  "No description available": "لا يوجد وصف متاح",
+  "Reviews": "التقييمات",
+  "No reviews available": "لا توجد تقييمات متاحة",
+  "Hire Now": "استئجار الآن",
+
+
+
+  "Privacy Policy": "سياسة الخصوصية",
+  "About us": "من نحن",
+  "Support": "الدعم",
+  "See All": "عرض الكل",
+  "What you are looking for today?": "ماذا تبحث عنه اليوم؟",
+  "Logout": "تسجيل الخروج",
+  "Home": "الرئيسية",
+  "Find Nearby Shop": "ابحث عن متجر قريب",
+  "Change Password": "تغيير كلمة المرور",
+  "Delete": "حذف",
+  "Delete account !": "حذف الحساب!",
+  "Please confirm to Delete button to Delete your account.": "يرجى تأكيد زر الحذف لحذف حسابك.",
+  "Language": "اللغة",
+  "Terms of Services": "شروط الخدمة",
+  "Current Password": "كلمة المرور الحالية",
+  "New Password": "كلمة المرور الجديدة",
+  "Enter new Password": "أدخل كلمة المرور الجديدة",
+  "Confirm Password": "تأكيد كلمة المرور",
+  "Re-Enter new Password": "أعد إدخال كلمة المرور الجديدة",
+  "Forget Password": "نسيت كلمة المرور",
+  "Save": "حفظ",
+  "Messages": "الرسائل",
+
+
+  "Categories": "الفئات",
+  "Delete Account": "حذف الحساب",
+  "Phone Number": "رقم الهاتف",
+  "First name": "الاسم الأول",
+  "Create a Password": "إنشاء كلمة مرور",
+  "Contact Number": "رقم الاتصال",
+  "House Location": "موقع المنزل",
+  "Enter your email": "أدخل بريدك الإلكتروني",
+  "Already have an account": "هل لديك حساب بالفعل",
+  "Last name": "اسم العائلة",
+  "All fields are required!": "جميع الحقول مطلوبة!",
+  "Sing in as a Employee": "تسجيل الدخول كموظف",
+  "Employee": "موظف",
+
+
+
+
+  "Pending": "قيد الانتظار",
+  "Queue": "طابور",
+  "Re-enter Password": "أعد إدخال كلمة المرور",
+  "Completed": "مكتمل",
+  "Hire Request": "طلب توظيف",
+  "Rejected": "مرفوض",
+  "My Services": "خدماتي",
+  "Add Employees": "إضافة موظفين",
+  "Wallet": "محفظة",
+
+
+
+
+  "Select Language": "اختر اللغة",
+  "Hire Request Details": "تفاصيل طلب التوظيف",
+  "Address": "العنوان",
+  "Service": "الخدمة",
+  "Name": "الاسم",
+  "Level Of Urgency": "مستوى الإلحاح",
+  "Pictures:": "الصور:",
+  "Reject": "رفض",
+  "Approve": "موافقة",
+  "Approve Request !": "طلب الموافقة!",
+  "Please confirm to Approve button to Approve request.": "يرجى التأكيد على زر الموافقة للموافقة على الطلب.",
+  "Reject Request !": "رفض الطلب!",
+  "Please confirm to Reject button to Reject your request.": "يرجى التأكيد على زر الرفض لرفض الطلب.",
+
+
+
+
+  "Fill in the Rejection Details": "املأ تفاصيل الرفض",
+  "Write in details": "اكتب التفاصيل",
+  "Send": "إرسال",
+  "Please fill up the details": "يرجى ملء التفاصيل",
+
+
+
+
+
+  "User Role": "دور المستخدم",
+  "Hire Request Service": "خدمة طلب التوظيف",
+  "Assigned Employee:": "الموظف المعين:",
+  "Running Jobs": "الأعمال الجارية",
+  "History Details": "تفاصيل السجل",
+
+
+
+
+  "Search": "بحث",
+  "No results found for the selected filters": "لم يتم العثور على نتائج للفلاتر المحددة",
+  "No results found": "لم يتم العثور على نتائج",
+  "Filter": "تصفية",
+  "Filters": "فلاتر",
+  "Price Type:": "نوع السعر:",
+  "Show Result": "عرض النتيجة",
+
+  "Want to Upload Description?": "هل تريد رفع وصف؟",
+  "Write here...": "اكتب هنا...",
+  "Upload the images": "قم برفع الصور",
+  "Level of Urgency": "مستوى الإلحاح",
+  "Extra Charge will be added for Urgency": "سيتم إضافة رسوم إضافية للإلحاح",
+  "Select Image Source": "اختر مصدر الصورة",
+  "Camera": "كاميرا",
+  "Gallery": "معرض الصور",
+  "Choose Your Nearby Service": "اختر الخدمة القريبة منك",
+
+
+
+  "Categories:": "الفئات:",
+  "Want to Upload any Pictures?": "هل تريد رفع أي صور؟",
+  "Points": "النقاط"
+}
+
+
+
+
+

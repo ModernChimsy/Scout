@@ -1,0 +1,2 @@
+/Users/rafi/scout_app/android/app/.cxx/RelWithDebInfo/2j1i2e6a/x86_64/CMakeFiles/edit_cache.dir
+/Users/rafi/scout_app/android/app/.cxx/RelWithDebInfo/2j1i2e6a/x86_64/CMakeFiles/rebuild_cache.dir

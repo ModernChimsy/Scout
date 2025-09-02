@@ -1,0 +1,166 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
+import 'package:restaurent_discount_app/common%20widget/custom_button_widget.dart';
+import 'package:restaurent_discount_app/common%20widget/custom_text_filed.dart';
+import 'package:restaurent_discount_app/uitilies/app_colors.dart';
+import 'package:restaurent_discount_app/uitilies/custom_loader.dart';
+import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
+import 'package:restaurent_discount_app/view/auth_view/controller/forget_password_controller.dart';
+import 'package:restaurent_discount_app/view/auth_view/otp_cofirmation_view.dart';
+import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
+
+class ForgetPasswordView extends StatelessWidget {
+  ForgetPasswordView({super.key});
+
+  final ForgetPasswordController _forgetPasswordController =
+      Get.put(ForgetPasswordController());
+  final TextEditingController _emailC = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
+          ThemeController.darkTheme;
+
+      return Scaffold(
+        body: Stack(
+          children: [
+            // Gradient Background
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: isDarkMode
+                      ? null
+                      : LinearGradient(
+                          begin: Alignment.topRight,
+                          end: Alignment.bottomLeft,
+                          colors: [
+                            Color(0xFFFB6012).withOpacity(0.1),
+                            Color(0xFFFFA07A).withOpacity(0.1),
+                          ],
+                        ),
+                  color: isDarkMode
+                      ? AppColors.bgColor
+                      : Colors.transparent, // Dark background color
+                ),
+              ),
+            ),
+
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: isDarkMode
+                      ? null
+                      : LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.white.withOpacity(0.5),
+                            Colors.white,
+                          ],
+                        ),
+                ),
+              ),
+            ),
+
+            // Foreground UI
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 80.h),
+
+                  // Logo and Progress Indicator
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Image(image: AssetImage("assets/images/long_logo.png")),
+                    ],
+                  ),
+
+                  SizedBox(height: 30.h),
+
+                  // Welcome Text
+                  CustomText(
+                    text: "Forgot Password",
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+
+                  SizedBox(height: 5.h),
+
+                  // Subtitle
+                  CustomText(
+                    textAlign: TextAlign.start,
+                    text:
+                        "Enter the email address used to create your account.",
+                    fontSize: 14.sp,
+                    color: isDarkMode ? Colors.white : Colors.black54,
+                  ),
+
+                  SizedBox(height: 20.h),
+
+                  // Password Field
+                  CustomText(
+                    text: "Email",
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                  SizedBox(height: 6.h),
+                  CustomTextField(
+                    controller: _emailC,
+                    fillColor: Colors.transparent,
+                    borderColor: Colors.grey,
+                    hintText: "Enter your email",
+                    showObscure: false,
+                  ),
+
+                  SizedBox(height: 10.h),
+
+                  Spacer(),
+
+                  Obx(() {
+                    return _forgetPasswordController.isLoading.value == true
+                        ? CustomLoader()
+                        : SizedBox(
+                            width: double.infinity,
+                            height: 48.h,
+                            child: CustomButtonWidget(
+                              bgColor: AppColors.btnColor,
+                              btnText: "Send Email",
+                              onTap: () {
+                                if (_emailC.text.isEmpty) {
+                                  CustomToast.showToast(
+                                      "Please enter your valid email",
+                                      isError: true);
+                                } else {
+                                  _forgetPasswordController.forgetPass(
+                                      email: _emailC.text);
+                                }
+                              },
+                              iconWant: false,
+                            ),
+                          );
+                  }),
+
+                  // Next Button
+
+                  SizedBox(height: 10.h),
+
+                  SizedBox(height: 40.h),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+}

@@ -1,0 +1,2 @@
+/Users/rafi/scout_app/android/app/.cxx/Debug/12n35293/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/rafi/scout_app/android/app/.cxx/Debug/12n35293/armeabi-v7a/CMakeFiles/rebuild_cache.dir
