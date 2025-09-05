@@ -70,7 +70,7 @@ class WelcomeView extends StatelessWidget {
                       SizedBox(height: 10),
                       CustomText(
                         text:
-                            'Discover and share the best local events with your friends',
+                        'Discover and share the best local events with your friends',
                         textAlign: TextAlign.center,
                         fontSize: 14,
                         color: Colors.white.withOpacity(0.7),
@@ -82,7 +82,10 @@ class WelcomeView extends StatelessWidget {
                         width: 300,
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            print('🧩Did Press Google Sign In');
+                            // TODO: Implement Google Sign-In functionality
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             side: BorderSide(color: Colors.white, width: 1),
