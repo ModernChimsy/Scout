@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 import '../../../uitilies/api/api_url.dart';
@@ -6,6 +7,9 @@ import '../../../uitilies/api/base_client.dart';
 import '../model/profile_model.dart';
 
 class ProfileGetController extends GetxController {
+
+  final log = Logger();
+
   var isLoading = false.obs;
   var profile = ProfileModel().obs;
 
@@ -25,12 +29,13 @@ class ProfileGetController extends GetxController {
 
       if (responseBody['success'] == true) {
         profile.value = ProfileModel.fromJson(responseBody);
-        print("Profile fetched: ${profile.value}");
+        log.d("🧩 Profile fetched: ${profile.value}");
+
       } else {
         throw 'Failed to load profile data: ${responseBody['message']}';
       }
     } catch (e) {
-      print("Error loading profile: $e");
+      log.e("❌ Error loading profile: $e");
     } finally {
       isLoading(false);
     }

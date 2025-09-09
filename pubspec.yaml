@@ -78,6 +78,7 @@ dependencies:
   path_provider:
   flutter_location_search: ^2.0.0
   intl:
+  logger: ^2.6.1
 
 
 

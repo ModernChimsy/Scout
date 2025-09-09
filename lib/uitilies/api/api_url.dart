@@ -16,8 +16,7 @@ class ApiUrl {
   static const String updateProfile = "$baseUrl/user/profile";
   static const String changePassword = "$baseUrl/auth/change-password";
   static const String getAllEvent = "$baseUrl/event?limit=99999";
-  static const String myInterestedEvent =
-      "$baseUrl/event/my-interest-events?limit=99999";
+  static const String myInterestedEvent = "$baseUrl/event/my-interest-events?limit=99999"; // TODO: Pagination goes here
   static const String myEvent = "$baseUrl/event/my-events?limit=99999";
   static const String todayEvent = "$baseUrl/event/today";
   static const String eventCreate = "$baseUrl/event/create";
