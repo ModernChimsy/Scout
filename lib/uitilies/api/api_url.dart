@@ -23,6 +23,7 @@ class ApiUrl {
   static const String getNotification = "$baseUrl/notification/notifications";
   static const String userList = "$baseUrl/user/nearby-users";
   static const String friendsEvent = "$baseUrl/event/friends-events";
+  static const String socialVerify = "$baseUrl/social/verify";
 
   static String eventDetails({required String eventId}) =>
       "$baseUrl/event/$eventId";
