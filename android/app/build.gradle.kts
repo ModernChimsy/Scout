@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "za.co.chimsy.golden"
+    namespace = "com.eventapp.scout"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "za.co.scoutevents"
+        applicationId = "com.eventapp.scout"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

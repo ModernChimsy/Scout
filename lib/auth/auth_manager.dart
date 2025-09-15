@@ -1,4 +1,3 @@
-// lib/auth/auth_manager.dart
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
@@ -6,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:restaurent_discount_app/auth/token_manager.dart';
-import 'package:restaurent_discount_app/uitilies/api/api_url.dart'; // ❗️ ADD: Import your ApiUrl class
+import 'package:restaurent_discount_app/uitilies/api/api_url.dart';
 import 'package:restaurent_discount_app/view/bottom_navigation_bar_view/bottom_navigation_bar_view.dart';
 import 'package:restaurent_discount_app/view/splash%20view/welcome_view.dart';
 
@@ -15,8 +14,6 @@ class AuthManager {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final TokenManager _tokenManager = TokenManager();
-
-  // ❗️ REMOVED: Unnecessary _apiBaseUrl variable
 
   Future<bool> signInWithGoogle() async {
     try {
@@ -58,7 +55,6 @@ class AuthManager {
   }
 
   Future<bool> _verifyTokenWithBackend(String idToken) async {
-    // ❗️ FIX: Use the socialVerify constant directly from your ApiUrl class
     final url = Uri.parse(ApiUrl.socialVerify);
     try {
       final response = await http.post(
@@ -73,8 +69,7 @@ class AuthManager {
         final responseData = json.decode(response.body)['data'];
         final String accessToken = responseData['accessToken'];
         final String refreshToken = responseData['refreshToken'];
-        await _tokenManager.saveTokens(
-            accessToken: accessToken, refreshToken: refreshToken);
+        await _tokenManager.saveTokens(accessToken: accessToken, refreshToken: refreshToken);
 
         Get.offAll(() => const BottomNavBarExample());
         return true;

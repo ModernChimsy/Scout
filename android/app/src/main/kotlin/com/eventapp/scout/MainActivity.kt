@@ -1,4 +1,4 @@
-package za.co.chimsy.golden
+package com.eventapp.scout
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -7,7 +7,6 @@ import 'package:restaurent_discount_app/view/auth_view/create_account.dart';
 import 'package:restaurent_discount_app/view/auth_view/sign_in_view.dart';
 import 'dart:ui';
 import '../../common widget/custom text/custom_text_widget.dart';
-// ❗️ FIX: Import the new controller
 import 'controller/welcome_controller.dart';
 
 class WelcomeView extends StatelessWidget {
@@ -15,7 +14,6 @@ class WelcomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ❗️ FIX: Initialize the controller for state management
     final WelcomeController controller = Get.put(WelcomeController());
 
     return Scaffold(
@@ -66,7 +64,6 @@ class WelcomeView extends StatelessWidget {
                         color: Colors.white.withOpacity(0.7),
                       ),
                       const SizedBox(height: 20),
-                      // ❗️ FIX: Updated Google Sign-in Button with loading state
                       SizedBox(
                         width: 300,
                         height: 50,
