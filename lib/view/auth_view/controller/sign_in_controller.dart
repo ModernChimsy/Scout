@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:restaurent_discount_app/uitilies/api/api_url.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
@@ -10,12 +11,12 @@ import 'package:restaurent_discount_app/view/bottom_navigation_bar_view/bottom_n
 
 class SignInController extends GetxController {
   var isLoading = false.obs;
+  final log = Logger();
   final StorageService _storageService = StorageService();
 
-  Future<void> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> login({required String email, required String password}) async {
+    log.i("ℹ️ SignInController");
+
     try {
       isLoading(true);
 
@@ -24,7 +25,7 @@ class SignInController extends GetxController {
         "password": password,
       };
 
-      print("Request Body: $map");
+      log.d("🧩 Request Body: $map");
 
       var response = await http.post(
         Uri.parse(ApiUrl.login),
@@ -44,7 +45,7 @@ class SignInController extends GetxController {
           await _storageService.write('accessToken', accessToken);
           await _storageService.write('id', id);
 
-          Get.offAll(()=> BottomNavBarExample());
+          Get.offAll(() => BottomNavBarExample());
 
           CustomToast.showToast("Login Successfully Done!");
         } else {
