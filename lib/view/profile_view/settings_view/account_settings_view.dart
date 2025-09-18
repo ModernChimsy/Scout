@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_app_bar_widget.dart';
 import 'package:restaurent_discount_app/uitilies/constant.dart';
-import 'package:restaurent_discount_app/view/auth_view/sign_in_view.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/view/profile_view/controller/profile_get_controller.dart';
 import 'package:restaurent_discount_app/view/profile_view/settings_view/account_privacy_view.dart';
@@ -17,13 +16,11 @@ import 'package:restaurent_discount_app/view/profile_view/settings_view/theme_vi
 import 'package:restaurent_discount_app/view/profile_view/settings_view/update_password_view.dart';
 import 'package:restaurent_discount_app/view/profile_view/widget/account_settings_top_section_widget.dart';
 import 'package:restaurent_discount_app/view/profile_view/widget/settings_card_widget.dart';
-import 'package:restaurent_discount_app/view/splash%20view/welcome_view.dart';
-
-import '../../../uitilies/api/local_storage.dart';
+import '../../../auth/auth_manager.dart';
 import '../widget/shimmer_profile_widget.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
-  AccountSettingsScreen({super.key});
+  const AccountSettingsScreen({super.key});
 
   @override
   _AccountSettingsScreenState createState() => _AccountSettingsScreenState();
@@ -31,6 +28,8 @@ class AccountSettingsScreen extends StatefulWidget {
 
 class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   final ProfileGetController _profileGetController = Get.put(ProfileGetController());
+
+  final AuthManager _authManager = AuthManager();
   late bool isDarkMode;
 
   @override
@@ -180,12 +179,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                 bgColor: isDarkMode ? Color(0xFF4B515580) : Color(0xFFF4F4F4),
                 title: 'Sign Out',
                 onTap: () async {
-                  final StorageService storageService = Get.put(StorageService());
-                  await storageService.remove('accessToken');
-
-                  // Todo: Confirm this change, it only made sense logically to redirect back to the screen where a user can either choose google or email& password to login or let alone create a new account after signing out
-                  // Get.offAll(() => SignInView());
-                  Get.offAll(() => WelcomeView());
+                  await _authManager.signOut();
                 },
                 image: 'assets/images/Vector (1).png',
                 iconColor: isDarkMode ? Colors.white : Colors.black,
