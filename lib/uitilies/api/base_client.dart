@@ -1,31 +1,24 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
-import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
+import 'package:restaurent_discount_app/auth/token_manager.dart';
 
 class BaseClient {
   static final log = Logger();
   static var noInternetMessage = "Please check your connection!";
 
-  static getRequest({required String api, params}) async {
+  static final TokenManager _tokenManager = TokenManager();
+
+  static Future<http.Response> getRequest({required String api, params}) async {
     log.i("ℹ️ Get Request");
 
-    /// get x storage
-    final StorageService _storageService = Get.put(StorageService());
-    String? accessToken = _storageService.read<String>('accessToken');
+    String? accessToken = await _tokenManager.getAccessToken();
+    log.i("🧩 AccessToken: $accessToken");
 
-    var headers = {
-      'Content-type': 'application/json',
-      "Authorization": "Bearer $accessToken"
-    };
+    var headers = {'Content-type': 'application/json', "Authorization": "Bearer $accessToken"};
 
-    http.Response response = await http.get(
-      Uri.parse(api).replace(queryParameters: params),
-      headers: headers,
-    );
+    http.Response response = await http.get(Uri.parse(api).replace(queryParameters: params), headers: headers);
 
     log.d("🧩 Request API Url: $api");
     log.d("🧩 Request params: $params");
@@ -36,20 +29,14 @@ class BaseClient {
     return response;
   }
 
-  static postRequest({required String api, body}) async {
+  static Future<http.Response> postRequest({required String api, body}) async {
     log.i("ℹ️ Post Request");
 
-    /// getx storage
-    final StorageService _storageService = Get.put(StorageService());
-    String? accessToken = _storageService.read<String>('accessToken');
+    String? accessToken = await _tokenManager.getAccessToken();
 
-    var headers = {
-      'Accept': 'application/json',
-      "Authorization": "Bearer $accessToken"
-    };
+    var headers = {'Accept': 'application/json', "Authorization": "Bearer $accessToken"};
 
-    http.Response response = await http.post(Uri.parse(api),
-        body: body, headers: headers, encoding: Encoding.getByName("utf-8"));
+    http.Response response = await http.post(Uri.parse(api), body: body, headers: headers, encoding: Encoding.getByName("utf-8"));
 
     log.d("🧩 Request API Url: $api");
     log.d("🧩 Request Body: ${jsonEncode(body)}");
@@ -59,20 +46,14 @@ class BaseClient {
     return response;
   }
 
-  static deleteRequest({required String api, body}) async {
+  static Future<http.Response> deleteRequest({required String api, body}) async {
     log.i("ℹ️ Delete Request");
 
-    /// getx storage
-    final StorageService _storageService = Get.put(StorageService());
-    String? accessToken = _storageService.read<String>('accessToken');
+    String? accessToken = await _tokenManager.getAccessToken();
 
-    var headers = {
-      'Accept': 'application/json',
-      "Authorization": "Bearer $accessToken"
-    };
+    var headers = {'Accept': 'application/json', "Authorization": "Bearer $accessToken"};
 
-    http.Response response =
-        await http.delete(Uri.parse(api), body: body, headers: headers);
+    http.Response response = await http.delete(Uri.parse(api), body: body, headers: headers);
 
     log.d("🧩 Request API Url: $api");
     log.d("🧩 Request Body: ${jsonEncode(body)}");
@@ -83,25 +64,15 @@ class BaseClient {
     return response;
   }
 
-  // Add PATCH method here
-  static patchRequest({required String api, required Map<String, dynamic> body}) async {
+  static Future<http.Response> patchRequest({required String api, required Map<String, dynamic> body}) async {
     log.i("ℹ️ Patch Request");
 
-    /// getx storage
-    final StorageService _storageService = Get.put(StorageService());
-    String? accessToken = _storageService.read<String>('accessToken');
+    String? accessToken = await _tokenManager.getAccessToken();
 
-    var headers = {
-      'Content-type': 'application/json',
-      "Authorization": "Bearer $accessToken"
-    };
+    var headers = {'Content-type': 'application/json', "Authorization": "Bearer $accessToken"};
 
     try {
-      http.Response response = await http.patch(
-        Uri.parse(api),
-        body: jsonEncode(body),
-        headers: headers,
-      );
+      http.Response response = await http.patch(Uri.parse(api), body: jsonEncode(body), headers: headers);
 
       log.d("🧩 Request API Url: $api");
       log.d("🧩 Request Body: ${jsonEncode(body)}");
@@ -117,7 +88,7 @@ class BaseClient {
     }
   }
 
-  static multipartAddRequest({
+  static Future<http.Response> multipartAddRequest({
     required String api,
     required Map<String, String> body,
     required String fileKeyName,

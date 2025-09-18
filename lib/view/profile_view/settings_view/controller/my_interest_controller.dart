@@ -1,17 +1,17 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:restaurent_discount_app/auth/token_manager.dart';
 import 'package:restaurent_discount_app/uitilies/api/api_url.dart';
 import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
 import 'package:restaurent_discount_app/view/profile_view/settings_view/account_settings_view.dart';
-import '../../../../../uitilies/api/local_storage.dart';
 import '../../controller/profile_get_controller.dart';
 
 class UpdateInterestController extends GetxController {
   var isLoading = false.obs;
 
   final ProfileGetController profileController =
-      Get.put(ProfileGetController());
+  Get.put(ProfileGetController());
 
   Future<void> updateInterest({
     required List<String> interests,
@@ -20,17 +20,15 @@ class UpdateInterestController extends GetxController {
       isLoading(true);
 
       var uri = Uri.parse(ApiUrl.updateProfile);
-      final StorageService _storageService = StorageService();
+      final TokenManager _tokenManager = TokenManager();
+      String? accessToken = await _tokenManager.getAccessToken();
 
-      String? accessToken = _storageService.read<String>('accessToken');
-
-      // Convert interests list to JSON
       var data = jsonEncode({
         'interest': interests,
       });
 
       var request = http.MultipartRequest('PATCH', uri)
-        ..fields['data'] = data; // Adding the data to the request body
+        ..fields['data'] = data;
 
       if (accessToken != null && accessToken.isNotEmpty) {
         request.headers['Authorization'] = 'Bearer $accessToken';
@@ -40,7 +38,6 @@ class UpdateInterestController extends GetxController {
       print("Request body: $data");
 
       var response = await request.send();
-
       String responseBody = await response.stream.bytesToString();
 
       print('Response status: ${response.statusCode}');
@@ -51,7 +48,6 @@ class UpdateInterestController extends GetxController {
 
         if (responseJson['success'] == true) {
           CustomToast.showToast("Interest update successful!");
-
           profileController.getProfile();
           Get.to(() => AccountSettingsScreen());
         } else {

@@ -19,34 +19,26 @@ class AuthManager {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-
         log.d("🧩 Google sign-in was canceled by the user.");
 
         return false;
       }
-      final GoogleSignInAuthentication googleAuth =
-      await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      final UserCredential userCredential =
-      await _firebaseAuth.signInWithCredential(credential);
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+      final UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
       final String? idToken = await userCredential.user?.getIdToken();
-      if (idToken == null) {
 
+      if (idToken == null) {
         log.d("🧩 Failed to get Firebase ID token.");
 
         return false;
       }
       return await _verifyTokenWithBackend(idToken);
     } on FirebaseAuthException catch (e) {
-      Get.snackbar('Authentication Error', 'Firebase error: ${e.message}',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Authentication Error', 'Firebase error: ${e.message}', snackPosition: SnackPosition.BOTTOM);
       return false;
     } catch (e) {
-      Get.snackbar('Authentication Error', 'An unexpected error occurred: $e',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Authentication Error', 'An unexpected error occurred: $e', snackPosition: SnackPosition.BOTTOM);
 
       log.d("🧩 Google Sign-In Error: $e");
 
@@ -55,15 +47,13 @@ class AuthManager {
   }
 
   Future<bool> _verifyTokenWithBackend(String idToken) async {
+    log.d("🧩 VerifyTokenWithBackend idToken: $idToken");
+
     final url = Uri.parse(ApiUrl.socialVerify);
     try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'token': idToken}),
-      );
-      if (response.statusCode == 200) {
+      final response = await http.post(url, headers: {'Content-Type': 'application/json'}, body: json.encode({'token': idToken}));
 
+      if (response.statusCode == 200) {
         log.d("🧩 Token verified by backend successfully.");
 
         final responseData = json.decode(response.body)['data'];
@@ -78,17 +68,13 @@ class AuthManager {
 
         log.d("🧩 Failed to verify token with backend: ${response.body}");
 
-        Get.snackbar('Login Failed', 'Server error: $error',
-            snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('Login Failed', 'Server error: $error', snackPosition: SnackPosition.BOTTOM);
         return false;
       }
     } catch (e) {
-
       log.d(" 🧩Error sending token to backend: $e");
 
-      Get.snackbar('Login Failed',
-          'Could not connect to the server. Please check your network connection.',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Login Failed', 'Could not connect to the server. Please check your network connection.', snackPosition: SnackPosition.BOTTOM);
       return false;
     }
   }
