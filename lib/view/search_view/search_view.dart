@@ -17,18 +17,15 @@ class EventCategoryScreen extends StatefulWidget {
 
 class _EventCategoryScreenState extends State<EventCategoryScreen> {
   final List<Category> categories = [
-    Category("Music",
-        "https://ciac.uiu.ac.bd/wp-content/uploads/2018/08/austin-neill-247047-unsplash.jpg"),
-    Category("Sport",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQujYgGA83X-bf70YeHs5PPzJCP107naLymbg&s"),
-    Category("Festivals",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbB14Z-rV5i2EHhz61PgqLVl4a0_BJhTcArg&s"),
-    Category("Art & Theatre",
-        "https://upload.wikimedia.org/wikipedia/commons/5/5d/Labudovo_jezero%2C_Balet_SNP-a%2C_Jelena_Le%C4%8Di%C4%87%2C_Andrej_Kol%C4%8Deriju%2C_foto_M._Polzovi%C4%87.jpg"),
-    Category("Nightlife",
-        "https://ciac.uiu.ac.bd/wp-content/uploads/2018/08/austin-neill-247047-unsplash.jpg"),
-    Category("Food & Drink",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_4y-42Isg1bbcN-2wfhw2YwpNMSgkJkWSXg&s"),
+    Category("Music", "https://ciac.uiu.ac.bd/wp-content/uploads/2018/08/austin-neill-247047-unsplash.jpg"),
+    Category("Sport", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQujYgGA83X-bf70YeHs5PPzJCP107naLymbg&s"),
+    Category("Festivals", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbB14Z-rV5i2EHhz61PgqLVl4a0_BJhTcArg&s"),
+    Category(
+      "Art & Theatre",
+      "https://upload.wikimedia.org/wikipedia/commons/5/5d/Labudovo_jezero%2C_Balet_SNP-a%2C_Jelena_Le%C4%8Di%C4%87%2C_Andrej_Kol%C4%8Deriju%2C_foto_M._Polzovi%C4%87.jpg",
+    ),
+    Category("Nightlife", "https://ciac.uiu.ac.bd/wp-content/uploads/2018/08/austin-neill-247047-unsplash.jpg"),
+    Category("Food & Drink", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_4y-42Isg1bbcN-2wfhw2YwpNMSgkJkWSXg&s"),
   ];
 
   final TextEditingController _searchC = TextEditingController();
@@ -47,9 +44,7 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
         if (query.isEmpty) {
           filteredCategories = categories;
         } else {
-          filteredCategories = categories
-              .where((category) => category.name.toLowerCase().contains(query))
-              .toList();
+          filteredCategories = categories.where((category) => category.name.toLowerCase().contains(query)).toList();
         }
       });
     });
@@ -58,19 +53,13 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
-          ThemeController.darkTheme;
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
         appBar: AppBar(
           forceMaterialTransparency: true,
           automaticallyImplyLeading: false,
-          title: CustomText(
-            text: 'Search',
-            color: isDarkMode ? Colors.white : Colors.black,
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
-          ),
+          title: CustomText(text: 'Search', color: isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
           centerTitle: false,
           backgroundColor: Colors.transparent,
         ),
@@ -90,9 +79,7 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
               SizedBox(height: 10),
               Expanded(
                 child: filteredCategories.isEmpty
-                    ? Center(
-                        child: NotFoundWidget(message: "No Search Result Found")
-                      )
+                    ? Center(child: NotFoundWidget(message: "No Search Result Found"))
                     : GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
@@ -104,15 +91,9 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
                         itemBuilder: (context, index) {
                           return GestureDetector(
                             onTap: () {
-                              Get.to(() => SearchDetailsPage(
-                                    tag: filteredCategories[index]
-                                        .name
-                                        .toLowerCase(),
-                                  ));
+                              Get.to(() => SearchDetailsPage(tag: filteredCategories[index].name.toLowerCase()));
                             },
-                            child: EventCategoryCard(
-                              category: filteredCategories[index],
-                            ),
+                            child: EventCategoryCard(category: filteredCategories[index]),
                           );
                         },
                       ),
@@ -127,6 +108,7 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
 
 class EventCategoryCard extends StatelessWidget {
   final Category category;
+
   const EventCategoryCard({required this.category});
 
   @override
@@ -134,22 +116,13 @@ class EventCategoryCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        image: DecorationImage(
-          image: NetworkImage(category.image),
-          fit: BoxFit.cover,
-        ),
+        image: DecorationImage(image: NetworkImage(category.image), fit: BoxFit.cover),
       ),
       child: Align(
         alignment: Alignment.bottomLeft,
         child: Padding(
           padding: const EdgeInsets.all(10.0),
-          child: CustomText(
-            textAlign: TextAlign.center,
-            text: category.name,
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          child: CustomText(textAlign: TextAlign.center, text: category.name, color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
     );
