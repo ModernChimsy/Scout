@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/uitilies/app_colors.dart';
 import 'package:restaurent_discount_app/uitilies/custom_loader.dart';
@@ -25,6 +26,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  static final log = Logger();
+
   int _currentIndex = 0;
 
   final ProfileGetController _profileGetController = Get.put(ProfileGetController());
@@ -156,6 +159,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           )
                           .toList();
 
+                      log.d("🧩 eventId: ${event.id}");
+                      log.d("🧩 image: ${event.image}");
+
                       return EventCard(
                         eventId: event.id,
                         image: event.image.toString(),
@@ -196,6 +202,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           )
                           .toList();
 
+                      log.d("🧩 eventId: ${event.id}");
+                      log.d("🧩 image: ${event.image}");
+
                       return EventCard(
                         eventId: event.id,
                         image: event.image.toString(),
@@ -234,6 +243,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               'https://t4.ftcdn.net/jpg/07/03/86/11/360_F_703861114_7YxIPnoH8NfmbyEffOziaXy0EO1NpRHD.jpg',
                         )
                         .toList();
+
+                    log.d("🧩 eventId: ${event.id}");
+                    log.d("🧩 image: ${event.image}");
 
                     return EventCard(
                       eventId: event.id,

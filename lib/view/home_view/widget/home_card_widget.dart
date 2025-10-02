@@ -29,7 +29,7 @@ class EventCard extends StatefulWidget {
   final bool? isLoading;
   final String? eventId;
 
-  EventCard({
+  const EventCard({
     super.key,
     required this.eventName,
     required this.eventDate,
@@ -53,11 +53,8 @@ class _EventCardState extends State<EventCard> {
   bool _isLoading = true;
   bool _isBookmarked = false;
 
-  final EventDeleteController _eventDeleteController =
-      Get.put(EventDeleteController());
-
-  final InterestedPostController _interestedPostController =
-      Get.put(InterestedPostController());
+  final EventDeleteController _eventDeleteController = Get.put(EventDeleteController());
+  final InterestedPostController _interestedPostController = Get.put(InterestedPostController());
   final AllEventController _allEventController = Get.put(AllEventController());
 
   @override
@@ -119,8 +116,7 @@ class _EventCardState extends State<EventCard> {
         interestedPeopleImage: widget.interestedPeopleImage,
       );
 
-      bool alreadyExists =
-          box.values.any((element) => element.eventId == widget.eventId);
+      bool alreadyExists = box.values.any((element) => element.eventId == widget.eventId);
 
       if (!alreadyExists) await box.add(event);
     }
@@ -133,16 +129,14 @@ class _EventCardState extends State<EventCard> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
-          ThemeController.darkTheme;
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
       return GestureDetector(
         onTap: widget.onTap,
         child: Card(
           elevation: 0.1,
           color: isDarkMode ? Colors.black : Colors.white,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -154,20 +148,15 @@ class _EventCardState extends State<EventCard> {
                         height: 330,
                         decoration: BoxDecoration(
                           color: Colors.grey,
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(10)),
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
                         ),
                       ),
                     )
                   : Container(
                       height: 330,
                       decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(widget.image),
-                          fit: BoxFit.fill,
-                        ),
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(10)),
+                        image: DecorationImage(image: NetworkImage(widget.image), fit: BoxFit.fill),
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
                       ),
                     ),
               Padding(
@@ -179,28 +168,16 @@ class _EventCardState extends State<EventCard> {
                         ? Shimmer.fromColors(
                             baseColor: Colors.grey.shade300,
                             highlightColor: Colors.grey.shade100,
-                            child: Container(
-                              height: 20,
-                              width: 160,
-                              color: Colors.grey,
-                            ),
+                            child: Container(height: 20, width: 160, color: Colors.grey),
                           )
                         : Wrap(
                             spacing: 8,
                             runSpacing: 6,
                             children: widget.categories.map((category) {
                               return Container(
-                                decoration: BoxDecoration(
-                                  color: categoryColor(category),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 5),
-                                child: CustomText(
-                                  text: category,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                decoration: BoxDecoration(color: categoryColor(category), borderRadius: BorderRadius.circular(5)),
+                                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                child: CustomText(text: category, fontSize: 13, fontWeight: FontWeight.w500),
                               );
                             }).toList(),
                           ),
@@ -210,9 +187,7 @@ class _EventCardState extends State<EventCard> {
                         : CustomText(
                             text: widget.eventDate,
                             fontSize: 14,
-                            color: isDarkMode
-                                ? Colors.white.withOpacity(0.7)
-                                : Colors.black.withOpacity(0.7),
+                            color: isDarkMode ? Colors.white.withOpacity(0.7) : Colors.black.withOpacity(0.7),
                           ),
                     SizedBox(height: 8),
                     _isLoading
@@ -241,24 +216,15 @@ class _EventCardState extends State<EventCard> {
                                   height: 38,
                                   child: CustomButtonWidget(
                                     weight: FontWeight.w500,
-                                    bgColor: isDarkMode
-                                        ? Color(0xFF742802)
-                                        : Color(0xFFFFF5F0),
+                                    bgColor: isDarkMode ? Color(0xFF742802) : Color(0xFFFFF5F0),
                                     btnTextSize: 13.0,
-                                    btnText: _interestedPostController
-                                            .isLoading.value
-                                        ? "Adding..."
-                                        : "I'm Interested",
+                                    btnText: _interestedPostController.isLoading.value ? "Adding..." : "I'm Interested",
                                     onTap: () async {
-                                      await _interestedPostController
-                                          .addToInterest(
-                                              eventId: widget.eventId ?? '');
+                                      await _interestedPostController.addToInterest(eventId: widget.eventId ?? '');
 
                                       _allEventController.getEvent();
                                     },
-                                    btnTextColor: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
+                                    btnTextColor: isDarkMode ? Colors.white : Colors.black,
                                     iconWant: false,
                                   ),
                                 ),
@@ -267,33 +233,23 @@ class _EventCardState extends State<EventCard> {
                               GestureDetector(
                                 onTap: _toggleBookmark,
                                 child: Icon(
-                                  _isBookmarked
-                                      ? Icons.bookmark
-                                      : Icons.bookmark_outline_outlined,
+                                  _isBookmarked ? Icons.bookmark : Icons.bookmark_outline_outlined,
                                   size: 30,
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
+                                  color: isDarkMode ? Colors.white : Colors.black,
                                 ),
                               ),
                               if (widget.onDeleteTap != null) ...[
                                 SizedBox(width: 16),
                                 Obx(() {
-                                  return _eventDeleteController
-                                              .isLoading.value ==
-                                          true
+                                  return _eventDeleteController.isLoading.value == true
                                       ? CustomLoader()
                                       : GestureDetector(
                                           onTap: () {
-                                            _eventDeleteController.deleteEvent(
-                                                eventId: widget.eventId);
+                                            _eventDeleteController.deleteEvent(eventId: widget.eventId);
                                           },
-                                          child: Icon(
-                                            Icons.delete_outline,
-                                            size: 30,
-                                            color: Colors.redAccent,
-                                          ),
+                                          child: Icon(Icons.delete_outline, size: 30, color: Colors.redAccent),
                                         );
-                                })
+                                }),
                               ],
                             ],
                           ),
@@ -324,11 +280,7 @@ class _EventCardState extends State<EventCard> {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade300,
       highlightColor: Colors.grey.shade100,
-      child: Container(
-        width: width,
-        height: height,
-        color: Colors.grey,
-      ),
+      child: Container(width: width, height: height, color: Colors.grey),
     );
   }
 }
