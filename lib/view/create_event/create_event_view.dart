@@ -64,13 +64,8 @@ class _CreateEventViewState extends State<CreateEventView> {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: isDarkMode
-                ? ColorScheme.dark(
-              primary: AppColors.btnColor,
-              surface: Colors.grey,
-            )
-                : ColorScheme.light(
-              primary: AppColors.btnColor,
-            ),
+                ? ColorScheme.dark(primary: AppColors.btnColor, surface: Colors.grey)
+                : ColorScheme.light(primary: AppColors.btnColor),
           ),
           child: child!,
         );
@@ -121,8 +116,7 @@ class _CreateEventViewState extends State<CreateEventView> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDarkMode =
-        Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
+    final bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.black : Colors.white,
@@ -212,8 +206,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                         selectedLongitude = locationData.longitude;
                       });
                     });
-                    print(
-                        "Selected Location → Lat: $selectedLatitude, Lng: $selectedLongitude");
+                    print("Selected Location → Lat: $selectedLatitude, Lng: $selectedLongitude");
                   }
                 },
                 child: Container(
