@@ -42,20 +42,22 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
     filteredCategories = categories;
 
     _searchC.addListener(() {
-      log.i("ℹ️ search_view.dart: _searchC.addListener()");
+      log.i("🧩 search_view.dart: _searchC.addListener()");
 
       final query = _searchC.text.trim().toLowerCase();
 
       setState(() {
-        log.i("ℹ️ search_view.dart: setState()");
-        log.d("query: $query");
-        log.d("categories: $categories");
+        log.i("🧩️ search_view.dart: setState()");
+        log.d("🧩 query: $query");
+        log.d("🧩 categories: $categories");
 
         if (query.isEmpty) {
           filteredCategories = categories;
         } else {
           filteredCategories = categories.where((category) => category.name.toLowerCase().contains(query)).toList();
         }
+
+        log.d("🧩 filteredCategories: $filteredCategories");
       });
     });
   }
