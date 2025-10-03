@@ -72,14 +72,14 @@ class _NearByLocationViewState extends State<NearByLocationView> {
                                     .interestEvents
                                     .map((interestEvent) =>
                                         interestEvent.user?.profilePicture ??
-                                        'https://t4.ftcdn.net/jpg/07/03/86/11/360_F_703861114_7YxIPnoH8NfmbyEffOziaXy0EO1NpRHD.jpg')
+                                        'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png')
                                     .toList();
 
                                 return EventCard(
                                   eventId: event.id,
                                   image: event.image?.isNotEmpty == true
                                       ? event.image.toString()
-                                      : 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png',
+                                      : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
                                   eventName: event.title ?? '',
                                   eventDate: event.date
                                           ?.toLocal()

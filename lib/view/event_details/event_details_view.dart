@@ -116,7 +116,7 @@ $imageUrl
                             image: NetworkImage(
                               eventDetails?.image?.isNotEmpty == true
                                   ? eventDetails!.image!
-                                  : 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png',
+                                  : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
                             ),
                             fit: BoxFit.cover,
                           ),
@@ -323,7 +323,7 @@ $imageUrl
                                     'No Name') as String,
                                 'profilePicture': (activity
                                             ?.user?.profilePicture ??
-                                        'https://t4.ftcdn.net/jpg/07/03/86/11/360_F_703861114_7YxIPnoH8NfmbyEffOziaXy0EO1NpRHD.jpg')
+                                        'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png')
                                     as String,
                               };
                             }).toList();
