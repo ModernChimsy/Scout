@@ -18,6 +18,7 @@ class CustomTextField extends StatefulWidget {
   final Color? hintTextColo;
   final int? maxLines;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
 
   const CustomTextField({
     Key? key,
@@ -34,6 +35,7 @@ class CustomTextField extends StatefulWidget {
     this.iconColor,
     this.hintTextColo,
     this.onChanged,
+    this.onSubmitted,
   }) : super(key: key);
 
   @override
@@ -45,6 +47,26 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
+    Widget? customSuffixIcon;
+
+    if (widget.showObscure) {
+      customSuffixIcon = IconButton(
+        icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
+        onPressed: () {
+          setState(() {
+            _obscureText = !_obscureText;
+          });
+        },
+      );
+    } else if (widget.prefixIcon != null) {
+      customSuffixIcon = Icon(widget.prefixIcon, color: widget.iconColor ?? Colors.grey);
+    } else if (widget.image != null) {
+      customSuffixIcon = Padding(
+        padding: EdgeInsets.all(10.sp),
+        child: Image.asset(widget.image!, width: 24.w, color: widget.iconColor, height: 24.h),
+      );
+    }
+
     return Container(
       width: Get.width,
       child: TextFormField(
@@ -52,61 +74,43 @@ class _CustomTextFieldState extends State<CustomTextField> {
         controller: widget.controller,
         readOnly: widget.readOnly ?? false,
         obscureText: widget.showObscure ? _obscureText : false,
-        maxLines: widget.maxLines ?? 1, // Set maxLines
-        onChanged: widget.onChanged, // Trigger the onChanged callback
+        maxLines: widget.maxLines ?? 1,
+        onChanged: widget.onChanged,
+        onFieldSubmitted: widget.onSubmitted,
         decoration: InputDecoration(
           filled: true,
           fillColor: widget.fillColor ?? Colors.white,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.sp),
-            borderSide: BorderSide(
-              color: widget.borderColor ?? AppColors.mainColor,
-              width: 1,
-            ),
+            borderSide: BorderSide(color: widget.borderColor ?? AppColors.mainColor, width: 1),
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.sp),
-            borderSide: BorderSide(
-              color: widget.borderColor ?? AppColors.mainColor,
-              width: 1,
-            ),
+            borderSide: BorderSide(color: widget.borderColor ?? AppColors.mainColor, width: 1),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.sp),
-            borderSide: BorderSide(
-              color: widget.borderColor ?? AppColors.mainColor,
-              width: 1,
-            ),
+            borderSide: BorderSide(color: widget.borderColor ?? AppColors.mainColor, width: 1),
           ),
-          prefixIcon: widget.prefixIcon != null
+          /**
+           * Only show the prefix icon if the customSuffixIcon is not set,
+           * to prevent double icons if the intent was to move it.
+           * Since the search screen specifically passed prefixIcon for the search icon,
+           * we are intentionally making this null for those cases and handling it in suffixIcon.
+           */
+          prefixIcon: (widget.prefixIcon != null || widget.image != null) && !widget.showObscure
+              ? null
+              : widget.prefixIcon != null
               ? Icon(widget.prefixIcon, color: widget.iconColor ?? Colors.grey)
               : widget.image != null
-                  ? Padding(
-                      padding: EdgeInsets.all(10.sp),
-                      child: Image.asset(
-                        widget.image!,
-                        width: 24.w,
-                        color: widget.iconColor,
-                        height: 24.h,
-                      ),
-                    )
-                  : null,
-          suffixIcon: widget.showObscure
-              ? IconButton(
-                  icon: Icon(
-                    _obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureText = !_obscureText;
-                    });
-                  },
+              ? Padding(
+                  padding: EdgeInsets.all(10.sp),
+                  child: Image.asset(widget.image!, width: 24.w, color: widget.iconColor, height: 24.h),
                 )
               : null,
+          suffixIcon: customSuffixIcon,
           hintText: widget.hintText,
-          hintStyle: GoogleFonts.poppins(
-              fontSize: 14.h, color: widget.hintTextColo ?? Colors.grey),
+          hintStyle: GoogleFonts.poppins(fontSize: 14.h, color: widget.hintTextColo ?? Colors.grey),
         ),
       ),
     );

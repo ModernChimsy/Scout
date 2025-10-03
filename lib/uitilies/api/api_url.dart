@@ -28,8 +28,17 @@ class ApiUrl {
 
   static String eventDetails({required String eventId}) => "$baseUrl/event/$eventId";
 
-  static String filterEvent({required String tag, required String endDate, required String startDate}) =>
-      "$baseUrl/event?startDate=$startDate&endDate=$endDate&tags=$tag&limit=99999";
+  static String filterEvent({required String tag, required String endDate, required String startDate, String? query}) {
+    final Map<String, dynamic> params = {'limit': '99999', 'startDate': startDate, 'endDate': endDate, 'tags': tag};
+
+    if (query != null && query.isNotEmpty) {
+      params['query'] = query;
+    }
+
+    final validParams = params.entries.where((e) => e.value != null && e.value.toString().isNotEmpty).map((e) => '${e.key}=${e.value}').join('&');
+
+    return "$baseUrl/event?$validParams";
+  }
 
   static String addEventInterested({required String eventId}) => "$baseUrl/event/interest/$eventId";
 
@@ -41,6 +50,5 @@ class ApiUrl {
 
   static String eventDelete({required String eventId}) => "$baseUrl/event/$eventId";
 
-  static String locationFilter({required dynamic lat, required dynamic long}) =>
-      "$baseUrl/event/nearby-events?latitude=$lat&longitude=$long&distance=1000";
+  static String locationFilter({required dynamic lat, required dynamic long}) => "$baseUrl/event/nearby-events?latitude=$lat&longitude=$long&distance=1000";
 }

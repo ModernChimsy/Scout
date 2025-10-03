@@ -7,6 +7,7 @@ import 'package:restaurent_discount_app/common%20widget/custom_text_filed.dart';
 import 'package:restaurent_discount_app/common%20widget/no_data_found_widget.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/view/search_view/controller/filter_controller.dart';
+import 'package:restaurent_discount_app/view/search_view/controller/location_filter_controller.dart';
 import 'package:restaurent_discount_app/view/search_view/search_details_page.dart';
 
 import '../../common widget/custom text/custom_text_widget.dart';
@@ -33,6 +34,7 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
 
   final TextEditingController _searchC = TextEditingController();
   final FilterController _filterController = Get.put(FilterController());
+  final LocationFilterController _locationFilterController = Get.put(LocationFilterController());
 
   List<Category> filteredCategories = [];
 
@@ -42,24 +44,33 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
     filteredCategories = categories;
 
     _searchC.addListener(() {
-      log.i("🧩 search_view.dart: _searchC.addListener()");
-
       final query = _searchC.text.trim().toLowerCase();
 
       setState(() {
-        log.i("🧩️ search_view.dart: setState()");
-        log.d("🧩 query: $query");
-        log.d("🧩 categories: $categories");
-
         if (query.isEmpty) {
           filteredCategories = categories;
         } else {
+          // Filter the displayed categories by what the user is typing (Local filtering)
           filteredCategories = categories.where((category) => category.name.toLowerCase().contains(query)).toList();
         }
-
-        log.d("🧩 filteredCategories: $filteredCategories");
       });
     });
+  }
+
+  // Function to handle the full-event search and navigation (Remote search)
+  void _handleSearchSubmit(String query) {
+    if (query.trim().isNotEmpty) {
+      // Navigate to SearchDetailsPage with the search query
+      Get.to(() => SearchDetailsPage(searchQuery: query.trim()));
+      // OPTIONAL: Clear the search field after submitting
+      // _searchC.clear();
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchC.dispose();
+    super.dispose();
   }
 
   @override
@@ -85,30 +96,33 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
                 prefixIcon: Icons.search,
                 fillColor: Colors.transparent,
                 borderColor: Colors.grey,
-                hintText: "Search for events",
+                hintText: "Search for friends or events",
                 showObscure: false,
+                onSubmitted: _handleSearchSubmit,
               ),
               SizedBox(height: 10),
               Expanded(
                 child: filteredCategories.isEmpty
                     ? Center(child: NotFoundWidget(message: "No Search Result Found"))
                     : GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: 0.8,
-                        ),
-                        itemCount: filteredCategories.length,
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              Get.to(() => SearchDetailsPage(tag: filteredCategories[index].name.toLowerCase()));
-                            },
-                            child: EventCategoryCard(category: filteredCategories[index]),
-                          );
-                        },
-                      ),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 0.8,
+                  ),
+                  itemCount: filteredCategories.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        // Navigate to SearchDetailsPage with the category tag
+                        // This triggers the category-based event search
+                        Get.to(() => SearchDetailsPage(tag: filteredCategories[index].name.toLowerCase()));
+                      },
+                      child: EventCategoryCard(category: filteredCategories[index]),
+                    );
+                  },
+                ),
               ),
             ],
           ),
