@@ -1,6 +1,7 @@
 class ApiUrl {
   static const String baseUrl = "https://api.scoutevents.co.za/api/v1";
   static const String socketGlobal = "https://renti-socket.techcrafters.tech";
+
   static String imageUrl({String? url}) {
     return "http://192.168.10.5:5005/$url";
   }
@@ -25,30 +26,29 @@ class ApiUrl {
   static const String friendsEvent = "$baseUrl/event/friends-events";
   static const String socialVerify = "$baseUrl/social/verify";
 
-  static String eventDetails({required String eventId}) =>
-      "$baseUrl/event/$eventId";
+  static String eventDetails({required String eventId}) => "$baseUrl/event/$eventId";
 
-  static String filterEvent(
-          {required String tag,
-          required String endDate,
-          required String startDate}) =>
-      "$baseUrl/event?startDate=$startDate&endDate=$endDate&tags=$tag&limit=99999";
+  static String filterEvent({required String tag, required String endDate, required String startDate, String? query}) {
+    final Map<String, dynamic> params = {'limit': '99999', 'startDate': startDate, 'endDate': endDate, 'tags': tag};
 
-  static String addEventInterested({required String eventId}) =>
-      "$baseUrl/event/interest/$eventId";
+    if (query != null && query.isNotEmpty) {
+      params['query'] = query;
+    }
 
-  static String publicProfile({required String userID}) =>
-      "$baseUrl/user/$userID";
+    final validParams = params.entries.where((e) => e.value != null && e.value.toString().isNotEmpty).map((e) => '${e.key}=${e.value}').join('&');
 
-  static String followUser({required String userID}) =>
-      "$baseUrl/connection/follow-user/$userID";
+    return "$baseUrl/event?$validParams";
+  }
 
-  static String block({required String userID}) =>
-      "$baseUrl/user/block/$userID";
+  static String addEventInterested({required String eventId}) => "$baseUrl/event/interest/$eventId";
 
-  static String eventDelete({required String eventId}) =>
-      "$baseUrl/event/$eventId";
+  static String publicProfile({required String userID}) => "$baseUrl/user/$userID";
 
-  static String locationFilter({required dynamic lat, required dynamic long}) =>
-      "$baseUrl/event/nearby-events?latitude=$lat&longitude=$long&distance=1000";
+  static String followUser({required String userID}) => "$baseUrl/connection/follow-user/$userID";
+
+  static String block({required String userID}) => "$baseUrl/user/block/$userID";
+
+  static String eventDelete({required String eventId}) => "$baseUrl/event/$eventId";
+
+  static String locationFilter({required dynamic lat, required dynamic long}) => "$baseUrl/event/nearby-events?latitude=$lat&longitude=$long&distance=1000";
 }

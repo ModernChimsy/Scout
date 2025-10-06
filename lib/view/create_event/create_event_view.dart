@@ -8,6 +8,7 @@ import 'package:flutter_location_search/flutter_location_search.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_app_bar_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_button_widget.dart';
@@ -36,6 +37,8 @@ class CreateEventView extends StatefulWidget {
 }
 
 class _CreateEventViewState extends State<CreateEventView> {
+  static final log = Logger();
+
   final TextEditingController _eventDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
   final TextEditingController _startTimeController = TextEditingController();
@@ -46,8 +49,7 @@ class _CreateEventViewState extends State<CreateEventView> {
 
   File? _eventImage;
 
-  final EventCreateController _eventCreateController =
-      Get.put(EventCreateController());
+  final EventCreateController _eventCreateController = Get.put(EventCreateController());
 
   String locationText = "Tap to select location";
   double? selectedLatitude;
@@ -64,13 +66,8 @@ class _CreateEventViewState extends State<CreateEventView> {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: isDarkMode
-                ? ColorScheme.dark(
-              primary: AppColors.btnColor,
-              surface: Colors.grey,
-            )
-                : ColorScheme.light(
-              primary: AppColors.btnColor,
-            ),
+                ? ColorScheme.dark(primary: AppColors.btnColor, surface: Colors.grey)
+                : ColorScheme.light(primary: AppColors.btnColor),
           ),
           child: child!,
         );
@@ -90,13 +87,8 @@ class _CreateEventViewState extends State<CreateEventView> {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: isDarkMode
-                ? ColorScheme.dark(
-              primary: AppColors.btnColor,
-              surface: Colors.grey,
-            )
-                : ColorScheme.light(
-              primary: AppColors.btnColor,
-            ),
+                ? ColorScheme.dark(primary: AppColors.btnColor, surface: Colors.grey)
+                : ColorScheme.light(primary: AppColors.btnColor),
           ),
           child: child!,
         );
@@ -106,7 +98,6 @@ class _CreateEventViewState extends State<CreateEventView> {
       controller.text = time.format(context);
     }
   }
-
 
   Future<void> _pickImageFromGallery() async {
     final ImagePicker picker = ImagePicker();
@@ -121,8 +112,7 @@ class _CreateEventViewState extends State<CreateEventView> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDarkMode =
-        Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
+    final bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.black : Colors.white,
@@ -150,29 +140,21 @@ class _CreateEventViewState extends State<CreateEventView> {
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color: isDarkMode
-                                    ? Color(0xFF742802)
-                                    : Color(0xFFFFF5F0),
+                                color: isDarkMode ? Color(0xFF742802) : Color(0xFFFFF5F0),
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.image_outlined),
                                   SizedBox(width: 8),
-                                  CustomText(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                    text: "Add Event Artwork",
-                                  ),
+                                  CustomText(color: isDarkMode ? Colors.white : Colors.black, text: "Add Event Artwork"),
                                 ],
                               ),
                             ),
                           )
                         : ClipRRect(
                             borderRadius: BorderRadius.circular(15),
-                            child: Image.file(_eventImage!,
-                                fit: BoxFit.cover, width: double.infinity),
+                            child: Image.file(_eventImage!, fit: BoxFit.cover, width: double.infinity),
                           ),
                   ),
                 ),
@@ -198,10 +180,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                   LocationData? locationData = await LocationSearch.show(
                     context: context,
                     mode: Mode.overlay,
-                    userAgent: UserAgent(
-                      appName: 'Scout',
-                      email: 'support@scout.com',
-                    ),
+                    userAgent: UserAgent(appName: 'Scout', email: 'support@scout.com'),
                   );
 
                   if (locationData != null) {
@@ -212,8 +191,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                         selectedLongitude = locationData.longitude;
                       });
                     });
-                    print(
-                        "Selected Location → Lat: $selectedLatitude, Lng: $selectedLongitude");
+                    log.d("🧩 Selected Location Lat: $selectedLatitude, Lng: $selectedLongitude");
                   }
                 },
                 child: Container(
@@ -231,10 +209,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                       Expanded(
                         child: Text(
                           locationText,
-                          style: TextStyle(
-                            color: isDarkMode ? Colors.white70 : Colors.black87,
-                            fontSize: 14.sp,
-                          ),
+                          style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black87, fontSize: 14.sp),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -400,91 +375,59 @@ class _CreateEventViewState extends State<CreateEventView> {
                         onTap: () {
                           final _storageService = Get.find<StorageService>();
 
-                          final bool isOwnAlcoholAllowed =
-                              _storageService.read<bool>('ownAlcohol') ?? false;
-                          final bool isCoatCheckRequired =
-                              _storageService.read<bool>('coatCheck') ?? false;
-                          final bool eventPrivate =
-                              _storageService.read<bool>('eventPrivate') ??
-                                  false;
-                          final bool isAgeRestricted =
-                              _storageService.read<bool>('isAgeRestricted') ??
-                                  false;
-                          final String savedAge = _storageService
-                                  .read<String>('minAgeRestriction') ??
-                              "18";
+                          final bool isOwnAlcoholAllowed = _storageService.read<bool>('ownAlcohol') ?? false;
+                          final bool isCoatCheckRequired = _storageService.read<bool>('coatCheck') ?? false;
+                          final bool eventPrivate = _storageService.read<bool>('eventPrivate') ?? false;
+                          final bool isAgeRestricted = _storageService.read<bool>('isAgeRestricted') ?? false;
+                          final String savedAge = _storageService.read<String>('minAgeRestriction') ?? "18";
 
-                          final String ticketLink =
-                              _storageService.read<String>('ticketSite') ??
-                                  "www.hello.com";
+                          final String ticketLink = _storageService.read<String>('ticketSite') ?? "www.hello.com";
 
-                          final String? tagsStr =
-                              _storageService.read<String>('selectedTags');
-                          final List<String> tags = tagsStr != null &&
-                                  tagsStr.isNotEmpty
-                              ? tagsStr.split(',').map((e) => e.trim()).toList()
-                              : [];
+                          final String? tagsStr = _storageService.read<String>('selectedTags');
+                          final List<String> tags = tagsStr != null && tagsStr.isNotEmpty ? tagsStr.split(',').map((e) => e.trim()).toList() : [];
 
-                          final List<String> ignoredUsers = _storageService
-                                  .read<List<String>>('hiddenUserIds') ??
-                              [];
+                          final List<String> ignoredUsers = _storageService.read<List<String>>('hiddenUserIds') ?? [];
 
-                          final List<String> inviteUser = _storageService
-                                  .read<List<String>>('inviteUserId') ??
-                              [];
+                          final List<String> inviteUser = _storageService.read<List<String>>('inviteUserId') ?? [];
 
                           final String title = _eventNameC.text.trim();
                           final String content = _descriptionC.text.trim();
                           final String date = _eventDateController.text.trim();
                           final String endDate = _endDateController.text.trim();
-                          final String startTime =
-                              _startTimeController.text.trim();
+                          final String startTime = _startTimeController.text.trim();
                           final String endTime = _endTimeController.text.trim();
 
-                          final dynamic rawActivities =
-                              _storageService.read('eventActivities');
-                          final List<Map<String, String>> activities =
-                              (rawActivities != null)
-                                  ? List<Map<String, String>>.from(
-                                      rawActivities.map((e) =>
-                                          Map<String, String>.from(e as Map)))
-                                  : [];
+                          final dynamic rawActivities = _storageService.read('eventActivities');
+                          final List<Map<String, String>> activities = (rawActivities != null)
+                              ? List<Map<String, String>>.from(rawActivities.map((e) => Map<String, String>.from(e as Map)))
+                              : [];
 
                           if (_eventImage == null) {
-                            CustomToast.showToast(
-                                "Please select an event image",
-                                isError: true);
+                            CustomToast.showToast("Please select an event image", isError: true);
                             return;
                           }
                           if (title.isEmpty) {
-                            CustomToast.showToast("Event title is required",
-                                isError: true);
+                            CustomToast.showToast("Event title is required", isError: true);
                             return;
                           }
                           if (content.isEmpty) {
-                            CustomToast.showToast(
-                                "Event description is required",
-                                isError: true);
+                            CustomToast.showToast("Event description is required", isError: true);
                             return;
                           }
                           if (date.isEmpty) {
-                            CustomToast.showToast("Event date is required",
-                                isError: true);
+                            CustomToast.showToast("Event date is required", isError: true);
                             return;
                           }
                           if (endDate.isEmpty) {
-                            CustomToast.showToast("Event end date is required",
-                                isError: true);
+                            CustomToast.showToast("Event end date is required", isError: true);
                             return;
                           }
                           if (startTime.isEmpty) {
-                            CustomToast.showToast("Start time is required",
-                                isError: true);
+                            CustomToast.showToast("Start time is required", isError: true);
                             return;
                           }
                           if (endTime.isEmpty) {
-                            CustomToast.showToast("End time is required",
-                                isError: true);
+                            CustomToast.showToast("End time is required", isError: true);
                             return;
                           }
 
@@ -516,14 +459,15 @@ class _CreateEventViewState extends State<CreateEventView> {
               }),
 
               CustomButtonWidget(
-                  weight: FontWeight.w500,
-                  btnTextColor: isDarkMode ? Colors.white : Colors.black,
-                  bgColor: Colors.transparent,
-                  btnText: "Cancel",
-                  onTap: () {
-                    Get.back();
-                  },
-                  iconWant: false),
+                weight: FontWeight.w500,
+                btnTextColor: isDarkMode ? Colors.white : Colors.black,
+                bgColor: Colors.transparent,
+                btnText: "Cancel",
+                onTap: () {
+                  Get.back();
+                },
+                iconWant: false,
+              ),
               SizedBox(height: 30.h),
             ],
           ),

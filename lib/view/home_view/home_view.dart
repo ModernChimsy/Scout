@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/uitilies/app_colors.dart';
 import 'package:restaurent_discount_app/uitilies/custom_loader.dart';
@@ -25,18 +26,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  static final log = Logger();
+
   int _currentIndex = 0;
 
-  final ProfileGetController _profileGetController =
-      Get.put(ProfileGetController());
+  final ProfileGetController _profileGetController = Get.put(ProfileGetController());
   final AllEventController _allEventController = Get.put(AllEventController());
-  final TodayEventController _todayEventController =
-      Get.put(TodayEventController());
-
-  final FriendsEventController _friendsEventController =
-      Get.put(FriendsEventController());
-
-  final List<String> tabs = ['For You', 'Friends', 'Today',];
+  final TodayEventController _todayEventController = Get.put(TodayEventController());
+  final FriendsEventController _friendsEventController = Get.put(FriendsEventController());
+  final List<String> tabs = ['For You', 'Friends', 'Today'];
 
   @override
   void initState() {
@@ -47,8 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
-          ThemeController.darkTheme;
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
@@ -59,21 +56,13 @@ class _HomeScreenState extends State<HomeScreen> {
             return _profileGetController.isLoading.value
                 ? Row(
                     children: [
-                      CustomText(
-                        text: 'Hello',
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      CustomText(text: 'Hello', color: isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
                       SizedBox(width: 10),
                       Shimmer.fromColors(
                         baseColor: AppColors.btnColor.withOpacity(0.5),
                         highlightColor: Colors.grey.shade400,
                         child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                          ),
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
                           width: 100,
                           height: 25,
                         ),
@@ -82,16 +71,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   )
                 : Row(
                     children: [
-                      CustomText(
-                        text: 'Hello',
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      CustomText(text: 'Hello', color: isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
                       SizedBox(width: 10),
                       CustomText(
-                        text:
-                            '${_profileGetController.profile.value.data?.firstName ?? "User"}',
+                        text: '${_profileGetController.profile.value.data?.firstName ?? "User"}',
                         color: isDarkMode ? Colors.white : Colors.black,
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
@@ -103,11 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: [
             GestureDetector(
               onTap: () => Get.to(() => NotificationScreen()),
-              child: Image.asset(
-                "assets/images/Bell.png",
-                width: 30,
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
+              child: Image.asset("assets/images/Bell.png", width: 30, color: isDarkMode ? Colors.white : Colors.black),
             ),
             SizedBox(width: 20),
           ],
@@ -137,23 +116,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       });
                     },
                     child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 7, horizontal: 30),
+                      padding: EdgeInsets.symmetric(vertical: 7, horizontal: 30),
                       decoration: BoxDecoration(
-                        color: _currentIndex == index
-                            ? AppColors.btnColor
-                            : Color(0xFFFFF5F0),
+                        color: _currentIndex == index ? AppColors.btnColor : Color(0xFFFFF5F0),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: CustomText(
                         text: tabs[index],
                         fontSize: 15,
-                        fontWeight: _currentIndex == index
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                        color: _currentIndex == index
-                            ? Colors.white
-                            : Colors.black,
+                        fontWeight: _currentIndex == index ? FontWeight.bold : FontWeight.normal,
+                        color: _currentIndex == index ? Colors.white : Colors.black,
                       ),
                     ),
                   );
@@ -167,13 +139,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     return CustomLoader();
                   }
 
-                  final eventList =
-                      _friendsEventController.nurseData.value.data ?? [];
+                  final eventList = _friendsEventController.nurseData.value.data ?? [];
 
                   if (eventList.isEmpty) {
-                    return Center(
-                      child: NotFoundWidget(message: 'Oops! Friends not Found'),
-                    );
+                    return Center(child: NotFoundWidget(message: 'Oops! Friends not Found'));
                   }
 
                   ListView.builder(
@@ -183,23 +152,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       final event = eventList[index];
 
                       final interestedPeopleImages = event.interestEvents
-                          .map((interestEvent) =>
-                              interestEvent.user?.profilePicture ??
-                              'https://t4.ftcdn.net/jpg/07/03/86/11/360_F_703861114_7YxIPnoH8NfmbyEffOziaXy0EO1NpRHD.jpg')
+                          .map(
+                            (interestEvent) =>
+                                interestEvent.user?.profilePicture ??
+                                'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
+                          )
                           .toList();
+
+                      log.d("🧩 eventId: ${event.id}");
+                      log.d("🧩 image: ${event.image}");
 
                       return EventCard(
                         eventId: event.id,
                         image: event.image.toString(),
                         eventName: event.title ?? '',
-                        eventDate:
-                            event.date?.toLocal().toString().split(' ')[0] ??
-                                '',
+                        eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
                         categories: event.tags,
                         eventDescription: event.content ?? '',
                         friendsInterested: event.interestEvents.length,
-                        onTap: () =>
-                            Get.to(() => EventDetailPage(eventId: event.id)),
+                        onTap: () => Get.to(() => EventDetailPage(eventId: event.id)),
                         interestedPeopleImage: interestedPeopleImages,
                       );
                     },
@@ -211,14 +182,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     return CustomLoader();
                   }
 
-                  final eventList =
-                      _todayEventController.nurseData.value.data ?? [];
+                  final eventList = _todayEventController.nurseData.value.data ?? [];
 
                   if (eventList.isEmpty) {
-                    return Center(
-                      child: NotFoundWidget(
-                          message: 'Oops! Today Event not Found'),
-                    );
+                    return Center(child: NotFoundWidget(message: 'Oops! Today Event not Found'));
                   }
 
                   ListView.builder(
@@ -228,23 +195,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       final event = eventList[index];
 
                       final interestedPeopleImages = event.interestEvents
-                          .map((interestEvent) =>
-                              interestEvent.user?.profilePicture ??
-                              'https://t4.ftcdn.net/jpg/07/03/86/11/360_F_703861114_7YxIPnoH8NfmbyEffOziaXy0EO1NpRHD.jpg')
+                          .map(
+                            (interestEvent) =>
+                                interestEvent.user?.profilePicture ??
+                                'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
+                          )
                           .toList();
+
+                      log.d("🧩 eventId: ${event.id}");
+                      log.d("🧩 image: ${event.image}");
 
                       return EventCard(
                         eventId: event.id,
                         image: event.image.toString(),
                         eventName: event.title ?? '',
-                        eventDate:
-                            event.date?.toLocal().toString().split(' ')[0] ??
-                                '',
+                        eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
                         categories: event.tags,
                         eventDescription: event.content ?? '',
                         friendsInterested: event.interestEvents.length,
-                        onTap: () =>
-                            Get.to(() => EventDetailPage(eventId: event.id)),
+                        onTap: () => Get.to(() => EventDetailPage(eventId: event.id)),
                         interestedPeopleImage: interestedPeopleImages,
                       );
                     },
@@ -255,13 +224,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   return CustomLoader();
                 }
 
-                final eventList =
-                    _allEventController.nurseData.value.data ?? [];
+                final eventList = _allEventController.nurseData.value.data ?? [];
 
                 if (eventList.isEmpty) {
-                  return Center(
-                    child: NotFoundWidget(message: 'Oops! No Event Found'),
-                  );
+                  return Center(child: NotFoundWidget(message: 'Oops! No Event Found'));
                 }
 
                 return ListView.builder(
@@ -271,24 +237,27 @@ class _HomeScreenState extends State<HomeScreen> {
                     final event = eventList[index];
 
                     final interestedPeopleImages = event.interestEvents
-                        .map((interestEvent) =>
-                            interestEvent.user?.profilePicture ??
-                            'https://t4.ftcdn.net/jpg/07/03/86/11/360_F_703861114_7YxIPnoH8NfmbyEffOziaXy0EO1NpRHD.jpg')
+                        .map(
+                          (interestEvent) =>
+                              interestEvent.user?.profilePicture ??
+                              'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
+                        )
                         .toList();
+
+                    log.d("🧩 eventId: ${event.id}");
+                    log.d("🧩 image: ${event.image}");
 
                     return EventCard(
                       eventId: event.id,
                       image: (event.image != null && event.image!.isNotEmpty)
                           ? event.image.toString()
-                          : 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png',
+                          : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
                       eventName: event.title ?? '',
-                      eventDate:
-                          event.date?.toLocal().toString().split(' ')[0] ?? '',
+                      eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
                       categories: event.tags,
                       eventDescription: event.content ?? '',
                       friendsInterested: event.interestEvents.length,
-                      onTap: () =>
-                          Get.to(() => EventDetailPage(eventId: event.id)),
+                      onTap: () => Get.to(() => EventDetailPage(eventId: event.id)),
                       interestedPeopleImage: interestedPeopleImages,
                     );
                   },

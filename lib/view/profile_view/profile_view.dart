@@ -150,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                                   .data!.profilePicture ==
                                               null
                                       ? NetworkImage(
-                                          'https://t4.ftcdn.net/jpg/07/03/86/11/360_F_703861114_7YxIPnoH8NfmbyEffOziaXy0EO1NpRHD.jpg')
+                                          'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png')
                                       : NetworkImage(_profileGetController
                                           .profile.value.data!.profilePicture
                                           .toString()) as ImageProvider,
@@ -314,7 +314,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                             (interestEvent) =>
                                                 interestEvent
                                                     .user?.profilePicture ??
-                                                'https://t4.ftcdn.net/jpg/07/03/86/11/360_F_703861114_7YxIPnoH8NfmbyEffOziaXy0EO1NpRHD.jpg',
+                                                'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
                                           )
                                           .toList() ??
                                       [];
@@ -325,7 +325,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 image: (event?.image != null &&
                                         event!.image!.isNotEmpty)
                                     ? event.image!
-                                    : 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png',
+                                    : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
                                 eventName: event?.title ?? '',
                                 eventDate: event?.date
                                         ?.toLocal()
@@ -371,7 +371,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                             (interestEvent) =>
                                                 interestEvent
                                                     .user?.profilePicture ??
-                                                'https://t4.ftcdn.net/jpg/07/03/86/11/360_F_703861114_7YxIPnoH8NfmbyEffOziaXy0EO1NpRHD.jpg',
+                                                'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
                                           )
                                           .toList() ??
                                       [];
@@ -382,7 +382,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 image: (event.image != null &&
                                         event.image!.isNotEmpty)
                                     ? event.image.toString()
-                                    : 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png',
+                                    : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
                                 eventName: eventDetails?.title ?? '',
                                 eventDate: eventDetails?.date
                                         ?.toLocal()
@@ -429,7 +429,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                       .interestEvents
                                       ?.map((interestEvent) =>
                                           interestEvent.user?.profilePicture ??
-                                          'https://t4.ftcdn.net/jpg/07/03/86/11/360_F_703861114_7YxIPnoH8NfmbyEffOziaXy0EO1NpRHD.jpg')
+                                          'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png')
                                       .toList() ??
                                   [];
 
@@ -438,7 +438,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 image: (event.image != null &&
                                         event.image!.isNotEmpty)
                                     ? event.image.toString()
-                                    : 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png',
+                                    : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
                                 eventName: event.title ?? '',
                                 eventDate: event.date
                                         ?.toLocal()

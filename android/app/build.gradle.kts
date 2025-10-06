@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -9,10 +12,37 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
+    fun getProperty(name: String, file: File): String {
+        val properties = Properties()
+        properties.load(FileInputStream(file))
+        return properties.getProperty(name)
+    }
+
+    val keystorePropertiesFile = rootProject.file("key.properties")
+
+    val releaseSigningConfig = signingConfigs.maybeCreate("release")
+
+    if (keystorePropertiesFile.exists()) {
+        println("🧩 Reading key.properties file.")
+        releaseSigningConfig.apply {
+            storeFile = file(getProperty("storeFile", keystorePropertiesFile))
+            storePassword = getProperty("storePassword", keystorePropertiesFile)
+            keyAlias = getProperty("keyAlias", keystorePropertiesFile)
+            keyPassword = getProperty("keyPassword", keystorePropertiesFile)
+        }
+    } else {
+        println("🧩 key.properties file not found. Using debug signing for release build.")
+        signingConfigs.getByName("debug").apply {
+            releaseSigningConfig.storeFile = storeFile
+            releaseSigningConfig.storePassword = storePassword
+            releaseSigningConfig.keyAlias = keyAlias
+            releaseSigningConfig.keyPassword = keyPassword
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-        // Enable core library desugaring
         isCoreLibraryDesugaringEnabled = true
     }
 
@@ -32,17 +62,21 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = releaseSigningConfig
+
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
+        // ... (other build types, e.g., debug)
     }
 }
 
 dependencies {
-    // Add desugaring library
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
-    // Add MultiDex dependency
     implementation("androidx.multidex:multidex:2.0.1")
 }
 

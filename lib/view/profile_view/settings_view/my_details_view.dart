@@ -98,7 +98,7 @@ class _MyDetailsViewState extends State<MyDetailsView> {
                             ? FileImage(File(_imageFile!.path))
                             : NetworkImage(profileController
                                         .profile.value.data?.profilePicture ??
-                                    'https://t4.ftcdn.net/jpg/07/03/86/11/360_F_703861114_7YxIPnoH8NfmbyEffOziaXy0EO1NpRHD.jpg')
+                                    'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png')
                                 as ImageProvider,
                       ),
                     ),

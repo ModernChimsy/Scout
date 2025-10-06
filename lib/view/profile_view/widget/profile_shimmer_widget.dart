@@ -27,9 +27,7 @@ class ProfileShimmerWidget extends StatelessWidget {
               color: Colors.white,
               border: Border.all(color: AppColors.btnColor, width: 2),
             ),
-            child: CircleAvatar(
-              backgroundImage: AssetImage('assets/placeholder_image.png'),
-            ),
+            child: CircleAvatar(backgroundImage: AssetImage('assets/images/placeholder_profile.jpeg')),
           ),
           const SizedBox(height: 10),
           Container(
