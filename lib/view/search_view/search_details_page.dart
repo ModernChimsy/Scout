@@ -15,6 +15,7 @@ import 'package:restaurent_discount_app/view/search_view/controller/filter_contr
 import 'package:restaurent_discount_app/view/search_view/controller/location_filter_controller.dart';
 import 'package:restaurent_discount_app/view/search_view/widget/date_range_widget.dart';
 import 'package:restaurent_discount_app/view/search_view/widget/location_page.dart';
+import 'package:restaurent_discount_app/view/search_view/widget/categories_filter_page.dart';
 
 class SearchDetailsPage extends StatefulWidget {
   final String? tag;
@@ -32,40 +33,67 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
 
   DateTimeRange? selectedDateRange;
 
+  Set<String> selectedCategories = {};
+
   @override
   void initState() {
     super.initState();
 
-    _filterController.filterEvents(tag: widget.tag ?? "", query: widget.searchQuery, startDate: "", endDate: "");
+    if (widget.tag != null && widget.tag!.isNotEmpty) {
+      selectedCategories.add(widget.tag!.toLowerCase());
+    }
+
+    _applyFilter(newTags: selectedCategories.join(','), newStartDate: "", newEndDate: "");
   }
 
-  // Helper method to determine the title of the page
   String getPageTitle() {
     if (widget.searchQuery != null && widget.searchQuery!.isNotEmpty) {
       return 'Results for "${widget.searchQuery!.capitalizeFirst}"';
-    } else if (widget.tag != null && widget.tag!.isNotEmpty) {
-      return widget.tag!.capitalizeFirst ?? 'Category Events';
+    } else if (selectedCategories.isNotEmpty) {
+      return 'Category Events';
     }
     return 'Event Filter';
   }
 
-  // Function to handle filter application
-  void _applyFilter({String? newTag, String? newStartDate, String? newEndDate}) {
-    // If a new tag is selected, it overrides the initial tag/query mode.
-    // Otherwise, maintain the initial search context (query OR tag).
-    String effectiveTag = newTag ?? widget.tag ?? "";
-    String? effectiveQuery = newTag != null ? null : widget.searchQuery;
+  void _applyFilter({String? newTags, String? newStartDate, String? newEndDate}) {
+    String effectiveTags = newTags ?? selectedCategories.join(',');
+    String? effectiveQuery = effectiveTags.isEmpty ? widget.searchQuery : null;
 
-    _filterController.filterEvents(tag: effectiveTag, query: effectiveQuery, startDate: newStartDate ?? "", endDate: newEndDate ?? "");
+    if (effectiveTags.isEmpty && widget.searchQuery != null) {
+      effectiveQuery = widget.searchQuery;
+    }
+
+    _filterController.filterEvents(
+      tag: effectiveTags,
+      query: effectiveQuery,
+      startDate: newStartDate ?? (selectedDateRange != null ? DateFormat('yyyy-MM-dd').format(selectedDateRange!.start) : ""),
+      endDate: newEndDate ?? (selectedDateRange != null ? DateFormat('yyyy-MM-dd').format(selectedDateRange!.end) : ""),
+    );
+  }
+
+  String getCategoryButtonTitle() {
+    if (selectedCategories.isEmpty) {
+      return 'Category';
+    } else if (selectedCategories.length == 1) {
+      return selectedCategories.first.capitalizeFirst ?? 'Category';
+    } else {
+      return 'Category (${selectedCategories.length})';
+    }
+  }
+
+  String getLocationButtonTitle(String locationName) {
+    if (locationName == "Location") return locationName;
+
+    String cityOrArea = locationName.split(',').first.trim();
+    String formattedName = cityOrArea.capitalizeFirst ?? cityOrArea;
+    return formattedName.length > 15 ? '${formattedName.substring(0, 15)}...' : formattedName;
   }
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
-
-      // Determine the category button title
-      String categoryButtonTitle = widget.tag?.capitalizeFirst ?? 'Category';
+      String categoryButtonTitle = getCategoryButtonTitle();
 
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
@@ -75,127 +103,85 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
           child: Column(
             children: [
               SizedBox(height: 20),
-              Row(
-                children: [
-                  // All Time / Date Range Filter
-                  TopWidgetBookmarks(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (BuildContext context) {
-                          return Container(
-                            height: 560,
-                            child: DateRangePickerPage(
-                              onDateRangeSelected: (range) {
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    TopWidgetBookmarks(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (BuildContext context) {
+                            return Container(
+                              height: 560,
+                              child: DateRangePickerPage(
+                                onDateRangeSelected: (range) {
+                                  setState(() {
+                                    selectedDateRange = range;
+                                  });
+
+                                  final startDate = DateFormat('yyyy-MM-dd').format(range.start);
+                                  final endDate = DateFormat('yyyy-MM-dd').format(range.end);
+
+                                  _applyFilter(newStartDate: startDate, newEndDate: endDate);
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      title: selectedDateRange != null ? 'Date: ${DateFormat('MMM d').format(selectedDateRange!.start)}' : 'Date',
+                      iconData: Icons.calendar_month,
+                      bgColor: isDarkMode ? Color(0xFF4B515580) : Color(0xFFF4F4F4),
+                      textColor: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                    SizedBox(width: 20),
+                    TopWidgetBookmarks(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: isDarkMode ? Colors.black : Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
+                          builder: (context) {
+                            return CategoriesFilterPage(
+                              initialSelectedCategories: selectedCategories,
+                              onCategoriesSelected: (newCategories) {
                                 setState(() {
-                                  selectedDateRange = range;
+                                  selectedCategories = newCategories;
                                 });
 
-                                final startDate = DateFormat('yyyy-MM-dd').format(range.start);
-                                final endDate = DateFormat('yyyy-MM-dd').format(range.end);
-
-                                // Apply date filter, preserving the existing tag/query
-                                _applyFilter(newStartDate: startDate, newEndDate: endDate);
-                                Navigator.pop(context);
+                                _applyFilter(newTags: newCategories.join(','));
                               },
-                            ),
+                            );
+                          },
+                        );
+                      },
+                      title: categoryButtonTitle,
+                      iconData: Icons.menu,
+                      bgColor: isDarkMode ? Color(0xFF4B515580) : Color(0xFFF4F4F4),
+                      textColor: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                    SizedBox(width: 20),
+                    Obx(() {
+                      return TopWidgetBookmarks(
+                        onTap: () {
+                          showModalBottomSheet(
+                            backgroundColor: isDarkMode ? Colors.black : Colors.white,
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (context) => Container(height: 700, child: LocationFilterScreen()),
                           );
                         },
+                        title: getLocationButtonTitle(_locationFilterController.selectedLocationName.value),
+                        iconData: Icons.location_on_outlined,
+                        bgColor: isDarkMode ? Color(0xFF4B515580) : Color(0xFFF4F4F4),
+                        textColor: isDarkMode ? Colors.white : Colors.black,
                       );
-                    },
-                    // Display selected date range or default
-                    title: selectedDateRange != null ? 'Date: ${DateFormat('MMM d').format(selectedDateRange!.start)}' : 'All Time',
-                    iconData: Icons.calendar_month,
-                    bgColor: isDarkMode ? Color(0xFF4B515580) : Color(0xFFF4F4F4),
-                    textColor: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                  SizedBox(width: 20),
-                  // Category Filter
-                  TopWidgetBookmarks(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        backgroundColor: isDarkMode ? Colors.black : Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
-                        builder: (context) {
-                          final categories = [
-                            'Festival',
-                            'Food',
-                            'Wine',
-                            'Sports',
-                            'Literature',
-                            'Concerts',
-                            'Nightlife',
-                            'Tech',
-                            'Music',
-                            'Art',
-                            'Fundraising',
-                            'Outdoor',
-                          ];
-
-                          return Container(
-                            padding: EdgeInsets.all(20),
-                            height: 350,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Select Category',
-                                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.white : Colors.black),
-                                ),
-                                SizedBox(height: 20),
-                                Expanded(
-                                  child: ListView.separated(
-                                    itemCount: categories.length,
-                                    separatorBuilder: (_, __) => Divider(),
-                                    itemBuilder: (context, index) {
-                                      final category = categories[index];
-                                      return ListTile(
-                                        title: Text(category, style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black87)),
-                                        onTap: () {
-                                          // Apply new tag, effectively clearing the search query mode
-                                          _applyFilter(
-                                            newTag: category.toLowerCase(),
-                                            newStartDate: selectedDateRange != null
-                                                ? DateFormat('yyyy-MM-dd').format(selectedDateRange!.start)
-                                                : null,
-                                            newEndDate: selectedDateRange != null ? DateFormat('yyyy-MM-dd').format(selectedDateRange!.end) : null,
-                                          );
-                                          Get.back();
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    title: categoryButtonTitle,
-                    iconData: Icons.menu,
-                    bgColor: isDarkMode ? Color(0xFF4B515580) : Color(0xFFF4F4F4),
-                    textColor: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                  SizedBox(width: 20),
-                  // Location Filter
-                  TopWidgetBookmarks(
-                    onTap: () {
-                      showModalBottomSheet(
-                        backgroundColor: isDarkMode ? Colors.black : Colors.white,
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (context) => Container(height: 700, child: LocationFilterScreen()),
-                      );
-                    },
-                    title: 'Location',
-                    iconData: Icons.location_on_outlined,
-                    bgColor: isDarkMode ? Color(0xFF4B515580) : Color(0xFFF4F4F4),
-                    textColor: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                ],
+                    }),
+                  ],
+                ),
               ),
               SizedBox(height: 20),
               Obx(() {
@@ -213,8 +199,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                             final interestedPeopleImages = event.interestEvents
                                 .map(
                                   (interestEvent) =>
-                                      interestEvent.user?.profilePicture ??
-                                      'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
+                                      interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
                                 )
                                 .toList();
 

@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_text_filed.dart';
 import 'package:restaurent_discount_app/common%20widget/no_data_found_widget.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
@@ -18,8 +17,6 @@ class EventCategoryScreen extends StatefulWidget {
 }
 
 class _EventCategoryScreenState extends State<EventCategoryScreen> {
-  static final log = Logger();
-
   final List<Category> categories = [
     Category("Music", "https://ciac.uiu.ac.bd/wp-content/uploads/2018/08/austin-neill-247047-unsplash.jpg"),
     Category("Sport", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQujYgGA83X-bf70YeHs5PPzJCP107naLymbg&s"),
