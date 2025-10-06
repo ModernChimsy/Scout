@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_app_bar_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/no_data_found_widget.dart';
 import 'package:restaurent_discount_app/uitilies/constant.dart';
@@ -28,6 +29,8 @@ class SearchDetailsPage extends StatefulWidget {
 }
 
 class _SearchDetailsPageState extends State<SearchDetailsPage> {
+  static final log = Logger();
+
   final FilterController _filterController = Get.find<FilterController>();
   final LocationFilterController _locationFilterController = Get.find<LocationFilterController>();
 
@@ -35,21 +38,37 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
 
   Set<String> selectedCategories = {};
 
+  String? initialTagDisplay;
+
   @override
   void initState() {
     super.initState();
 
     if (widget.tag != null && widget.tag!.isNotEmpty) {
-      selectedCategories.add(widget.tag!.toLowerCase());
+      initialTagDisplay = widget.tag;
+      selectedCategories.add(_prepareCategoryForApi(widget.tag!));
     }
 
     _applyFilter(newTags: selectedCategories.join(','), newStartDate: "", newEndDate: "");
   }
 
+  String _prepareCategoryForApi(String name) {
+    return name.replaceAll(RegExp(r'[^a-zA-Z0-9\s]'), ' ').trim().toLowerCase();
+  }
+
   String getPageTitle() {
     if (widget.searchQuery != null && widget.searchQuery!.isNotEmpty) {
       return 'Results for "${widget.searchQuery!.capitalizeFirst}"';
-    } else if (selectedCategories.isNotEmpty) {
+    }
+    else if (selectedCategories.isNotEmpty) {
+      String capitalizedCategories = selectedCategories
+          .map((category) => category.split(' ').map((word) => word.capitalizeFirst).join(' '))
+          .join(', ');
+
+      if (selectedCategories.length == 1 && capitalizedCategories.isNotEmpty) {
+        return capitalizedCategories;
+      }
+
       return 'Category Events';
     }
     return 'Event Filter';
@@ -57,15 +76,18 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
 
   void _applyFilter({String? newTags, String? newStartDate, String? newEndDate}) {
     String effectiveTags = newTags ?? selectedCategories.join(',');
-    String? effectiveQuery = effectiveTags.isEmpty ? widget.searchQuery : null;
+    String? apiTags = effectiveTags.isEmpty ? "" : effectiveTags;
+    String? apiQuery;
 
-    if (effectiveTags.isEmpty && widget.searchQuery != null) {
-      effectiveQuery = widget.searchQuery;
+    if (widget.searchQuery != null && widget.searchQuery!.isNotEmpty) {
+      apiQuery = effectiveTags.isEmpty ? widget.searchQuery : null;
+    } else if (effectiveTags.isNotEmpty) {
+      apiQuery = effectiveTags.replaceAll(',', ' ');
     }
 
     _filterController.filterEvents(
-      tag: effectiveTags,
-      query: effectiveQuery,
+      tag: apiTags,
+      query: apiQuery,
       startDate: newStartDate ?? (selectedDateRange != null ? DateFormat('yyyy-MM-dd').format(selectedDateRange!.start) : ""),
       endDate: newEndDate ?? (selectedDateRange != null ? DateFormat('yyyy-MM-dd').format(selectedDateRange!.end) : ""),
     );
@@ -75,7 +97,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
     if (selectedCategories.isEmpty) {
       return 'Category';
     } else if (selectedCategories.length == 1) {
-      return selectedCategories.first.capitalizeFirst ?? 'Category';
+      return selectedCategories.first.split(' ').map((word) => word.capitalizeFirst).join(' ') ?? 'Category';
     } else {
       return 'Category (${selectedCategories.length})';
     }
@@ -142,18 +164,21 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                       onTap: () {
                         showModalBottomSheet(
                           context: context,
+                          isScrollControlled: true,
                           backgroundColor: isDarkMode ? Colors.black : Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
                           builder: (context) {
-                            return CategoriesFilterPage(
-                              initialSelectedCategories: selectedCategories,
-                              onCategoriesSelected: (newCategories) {
-                                setState(() {
-                                  selectedCategories = newCategories;
-                                });
-
-                                _applyFilter(newTags: newCategories.join(','));
-                              },
+                            return Container(
+                              height: MediaQuery.of(context).size.height * 0.9,
+                              child: CategoriesFilterPage(
+                                initialSelectedCategories: selectedCategories,
+                                onCategoriesSelected: (newCategories) {
+                                  setState(() {
+                                    selectedCategories = newCategories.map((c) => _prepareCategoryForApi(c)).toSet();
+                                  });
+                                  _applyFilter(newTags: selectedCategories.join(','));
+                                },
+                              ),
                             );
                           },
                         );
