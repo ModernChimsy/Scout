@@ -39,8 +39,7 @@ class _TicketsViewState extends State<TicketsView> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode =
-          Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
@@ -76,9 +75,7 @@ class _TicketsViewState extends State<TicketsView> {
                     final site = siteController.text.trim();
 
                     if (site.isEmpty) {
-                      CustomToast.showToast(
-                          "Please enter a ticket website URL.",
-                          isError: true);
+                      CustomToast.showToast("Please enter a ticket website URL.", isError: true);
                       return;
                     }
 
