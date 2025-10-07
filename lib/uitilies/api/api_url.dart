@@ -2,10 +2,6 @@ class ApiUrl {
   static const String baseUrl = "https://api.scoutevents.co.za/api/v1";
   static const String socketGlobal = "https://renti-socket.techcrafters.tech";
 
-  static String imageUrl({String? url}) {
-    return "http://192.168.10.5:5005/$url";
-  }
-
   static String socketURL = "http://115.127.156.14:5006";
   static const String signInEndPoint = "$baseUrl/users/create-customers";
   static const String login = "$baseUrl/auth/sign-in";
@@ -16,9 +12,9 @@ class ApiUrl {
   static const String getProfile = "$baseUrl/user/profile";
   static const String updateProfile = "$baseUrl/user/profile";
   static const String changePassword = "$baseUrl/auth/change-password";
-  static const String getAllEvent = "$baseUrl/event?limit=99999";
+  static const String getAllEvent = "$baseUrl/event?limit=99999";  // TODO: Pagination goes here
   static const String myInterestedEvent = "$baseUrl/event/my-interest-events?limit=99999"; // TODO: Pagination goes here
-  static const String myEvent = "$baseUrl/event/my-events?limit=99999";
+  static const String myEvent = "$baseUrl/event/my-events?limit=99999";  // TODO: Pagination goes here
   static const String todayEvent = "$baseUrl/event/today";
   static const String eventCreate = "$baseUrl/event/create";
   static const String getNotification = "$baseUrl/notification/notifications";
@@ -28,6 +24,7 @@ class ApiUrl {
 
   static String eventDetails({required String eventId}) => "$baseUrl/event/$eventId";
 
+  // TODO: Pagination goes here
   static String filterEvent({required String tag, required String endDate, required String startDate, String? query}) {
     final Map<String, dynamic> params = {'limit': '99999', 'startDate': startDate, 'endDate': endDate, 'tags': tag};
 
