@@ -41,11 +41,17 @@ class _ExtraViewState extends State<ExtraView> {
     });
   }
 
-  void _saveOptions() async {
+  void _saveOptionsAndExit() async {
     try {
+      if (!coatCheck && !ownAlcohol) {
+        CustomToast.showToast("No extra options selected.", isError: false);
+      }
+
       await _storageService.write('coatCheck', coatCheck);
       await _storageService.write('ownAlcohol', ownAlcohol);
-      CustomToast.showToast("Options saved successfully.");
+      CustomToast.showToast("Extra options saved successfully.");
+
+      Get.back();
     } catch (e) {
       CustomToast.showToast("Failed to save options.", isError: true);
     }
@@ -54,8 +60,7 @@ class _ExtraViewState extends State<ExtraView> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
-          ThemeController.darkTheme;
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
@@ -93,12 +98,7 @@ class _ExtraViewState extends State<ExtraView> {
               SizedBox(
                 width: double.infinity,
                 height: 48.h,
-                child: CustomButtonWidget(
-                  bgColor: AppColors.btnColor,
-                  btnText: "Update",
-                  onTap: _saveOptions,
-                  iconWant: false,
-                ),
+                child: CustomButtonWidget(bgColor: AppColors.btnColor, btnText: "Update", onTap: _saveOptionsAndExit, iconWant: false),
               ),
               SizedBox(height: 46.h),
             ],

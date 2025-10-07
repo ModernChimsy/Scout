@@ -19,6 +19,8 @@ class CustomTextField extends StatefulWidget {
   final int? maxLines;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
+  final FocusNode? focusNode;
+  final String? initialValue;
 
   const CustomTextField({
     Key? key,
@@ -36,6 +38,8 @@ class CustomTextField extends StatefulWidget {
     this.hintTextColo,
     this.onChanged,
     this.onSubmitted,
+    this.focusNode,
+    this.initialValue,
   }) : super(key: key);
 
   @override
@@ -58,20 +62,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
           });
         },
       );
-    } else if (widget.prefixIcon != null) {
-      customSuffixIcon = Icon(widget.prefixIcon, color: widget.iconColor ?? Colors.grey);
-    } else if (widget.image != null) {
-      customSuffixIcon = Padding(
-        padding: EdgeInsets.all(10.sp),
-        child: Image.asset(widget.image!, width: 24.w, color: widget.iconColor, height: 24.h),
-      );
     }
 
     return Container(
       width: Get.width,
       child: TextFormField(
+        focusNode: widget.focusNode,
         keyboardType: widget.keyboardType,
         controller: widget.controller,
+        initialValue: widget.controller == null ? widget.initialValue : null,
         readOnly: widget.readOnly ?? false,
         obscureText: widget.showObscure ? _obscureText : false,
         maxLines: widget.maxLines ?? 1,
@@ -92,17 +91,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
             borderRadius: BorderRadius.circular(8.sp),
             borderSide: BorderSide(color: widget.borderColor ?? AppColors.mainColor, width: 1),
           ),
-          /**
-           * Only show the prefix icon if the customSuffixIcon is not set,
-           * to prevent double icons if the intent was to move it.
-           * Since the search screen specifically passed prefixIcon for the search icon,
-           * we are intentionally making this null for those cases and handling it in suffixIcon.
-           */
-          prefixIcon: (widget.prefixIcon != null || widget.image != null) && !widget.showObscure
-              ? null
-              : widget.prefixIcon != null
+          prefixIcon: (widget.prefixIcon != null && !widget.showObscure)
               ? Icon(widget.prefixIcon, color: widget.iconColor ?? Colors.grey)
-              : widget.image != null
+              : (widget.image != null && !widget.showObscure)
               ? Padding(
                   padding: EdgeInsets.all(10.sp),
                   child: Image.asset(widget.image!, width: 24.w, color: widget.iconColor, height: 24.h),

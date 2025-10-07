@@ -27,6 +27,7 @@ class _HideEventPageState extends State<HideEventPage> {
   final GetUserController controller = Get.put(GetUserController());
   final StorageService _storageService = StorageService();
   final TextEditingController searchController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   List<String> selectedUserIds = [];
   List<dynamic> _filteredUsers = [];
@@ -38,6 +39,26 @@ class _HideEventPageState extends State<HideEventPage> {
     super.initState();
     _loadSelectedUserIds();
     _fetchUsers();
+
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  void _onFocusChange() {
+    if (!_focusNode.hasFocus) {
+      Future.delayed(Duration(milliseconds: 100), () {
+        if (mounted) {
+          _saveAndExit();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    searchController.dispose();
+    super.dispose();
   }
 
   void _loadSelectedUserIds() {
@@ -62,6 +83,7 @@ class _HideEventPageState extends State<HideEventPage> {
         selectedUserIds.remove(id);
       }
     });
+    // TODO: save on every toggle if list is small, but Update button is safer, better for user experience in the future
   }
 
   void _filterUserList(String query) {
@@ -79,10 +101,20 @@ class _HideEventPageState extends State<HideEventPage> {
     setState(() {});
   }
 
+  void _saveAndExit() {
+    if (selectedUserIds.isEmpty) {
+      CustomToast.showToast("No users selected. Event will be visible to all.", isError: false);
+    }
+
+    _storageService.write('hiddenUserIds', selectedUserIds);
+    CustomToast.showToast("Hidden users updated successfully!", isError: false);
+
+    Get.back();
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode =
-        Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
+    bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
     return Scaffold(
       appBar: CustomAppBar(title: "Hide from others"),
@@ -99,98 +131,70 @@ class _HideEventPageState extends State<HideEventPage> {
             ),
             SizedBox(height: 6.h),
             CustomTextField(
+              controller: searchController,
+              focusNode: _focusNode,
               fillColor: Colors.transparent,
               borderColor: Colors.grey,
               hintText: "Search here...",
               showObscure: false,
               prefixIcon: Icons.search,
-              controller: searchController,
               onChanged: _filterUserList,
+              onSubmitted: (_) => _saveAndExit(),
             ),
             SizedBox(height: 20),
 
             isLoading
                 ? Expanded(child: Center(child: CustomLoader()))
                 : Expanded(
-              child: _filteredUsers.isEmpty
-                  ? Center(
-                child: Text(
-                  "No users found.",
-                  style: TextStyle(
-                    color:
-                    isDarkMode ? Colors.white : Colors.black54,
+                    child: _filteredUsers.isEmpty && searchController.text.isEmpty
+                        ? Center(
+                            child: Text("No users available.", style: TextStyle(color: isDarkMode ? Colors.white : Colors.black54)),
+                          )
+                        : _filteredUsers.isEmpty
+                        ? Center(
+                            child: Text("No matching users found.", style: TextStyle(color: isDarkMode ? Colors.white : Colors.black54)),
+                          )
+                        : ListView.builder(
+                            itemCount: _filteredUsers.length,
+                            itemBuilder: (context, index) {
+                              final user = _filteredUsers[index];
+                              final isSelected = selectedUserIds.contains(user.id);
+
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: user.profilePicture != null
+                                      ? NetworkImage(user.profilePicture!)
+                                      : NetworkImage("https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png"),
+                                ),
+                                title: CustomText(
+                                  text: user.fullname ?? "Unknown",
+                                  color: isDarkMode ? Colors.white : Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  textAlign: TextAlign.start,
+                                ),
+                                subtitle: CustomText(
+                                  text: user.email ?? "No email",
+                                  color: isDarkMode ? Colors.white70 : Colors.black54,
+                                  fontSize: 14,
+                                  italic: FontStyle.italic,
+                                  textAlign: TextAlign.start,
+                                ),
+                                trailing: Checkbox(
+                                  value: isSelected,
+                                  onChanged: (value) {
+                                    _toggleUserSelection(user.id!, value!);
+                                  },
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                  side: BorderSide(color: AppColors.btnColor, width: 2),
+                                  activeColor: AppColors.btnColor,
+                                ),
+                              );
+                            },
+                          ),
                   ),
-                ),
-              )
-                  : ListView.builder(
-                itemCount: _filteredUsers.length,
-                itemBuilder: (context, index) {
-                  final user = _filteredUsers[index];
-                  final isSelected =
-                  selectedUserIds.contains(user.id);
 
-                  return ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: user.profilePicture != null
-                          ? NetworkImage(user.profilePicture!)
-                          : NetworkImage(
-                          "https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png"),
-                    ),
-                    title: CustomText(
-                      text: user.fullname ?? "Unknown",
-                      color: isDarkMode
-                          ? Colors.white
-                          : Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      textAlign: TextAlign.start,
-                    ),
-                    subtitle: CustomText(
-                      text: user.email ?? "No email",
-                      color: isDarkMode
-                          ? Colors.white70
-                          : Colors.black54,
-                      fontSize: 14,
-                      italic: FontStyle.italic,
-                      textAlign: TextAlign.start,
-                    ),
-                    trailing: Checkbox(
-                      value: isSelected,
-                      onChanged: (value) {
-                        _toggleUserSelection(user.id!, value!);
-                      },
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      side: BorderSide(
-                          color: AppColors.btnColor, width: 2),
-                      activeColor: AppColors.btnColor,
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            CustomButtonWidget(
-              bgColor: AppColors.btnColor,
-              btnText: "Update",
-              onTap: () {
-                if (selectedUserIds.isEmpty) {
-                  CustomToast.showToast(
-                    "Please select at least one user to hide",
-                    isError: true,
-                  );
-                  return;
-                }
-
-                _storageService.write('hiddenUserIds', selectedUserIds);
-                print("✅ Saved hiddenUserIds locally: $selectedUserIds");
-
-                CustomToast.showToast(
-                    "Hidden users updated successfully!", isError: false);
-              },
-              iconWant: false,
-            ),
+            CustomButtonWidget(bgColor: AppColors.btnColor, btnText: "Update", onTap: _saveAndExit, iconWant: false),
             SizedBox(height: 50),
           ],
         ),

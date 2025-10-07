@@ -55,6 +55,14 @@ class _CreateEventViewState extends State<CreateEventView> {
   double? selectedLatitude;
   double? selectedLongitude;
 
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<StorageService>()) {
+      Get.put(StorageService());
+    }
+  }
+
   Future<void> _pickDate(TextEditingController controller) async {
     final isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
     DateTime? date = await showDatePicker(
@@ -161,7 +169,6 @@ class _CreateEventViewState extends State<CreateEventView> {
               ),
               SizedBox(height: 20),
 
-              /// Event Name
               CustomTextField(
                 controller: _eventNameC,
                 hintTextColo: isDarkMode ? Colors.grey : Colors.black,
@@ -307,7 +314,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                 borderColor: Colors.grey,
               ),
 
-              /// Event Cards
+              /// Event Cards - Sub Forms
               SizedBox(height: 20),
               EventCardWidget(
                 bgColor: isDarkMode ? Color(0xFF4B515580) : Color(0xFFFFF5F0),
@@ -379,15 +386,13 @@ class _CreateEventViewState extends State<CreateEventView> {
                           final bool isCoatCheckRequired = _storageService.read<bool>('coatCheck') ?? false;
                           final bool eventPrivate = _storageService.read<bool>('eventPrivate') ?? false;
                           final bool isAgeRestricted = _storageService.read<bool>('isAgeRestricted') ?? false;
+
                           final String savedAge = _storageService.read<String>('minAgeRestriction') ?? "18";
-
-                          final String ticketLink = _storageService.read<String>('ticketSite') ?? "www.hello.com";
-
+                          final String ticketLink = _storageService.read<String>('ticketSite') ?? "https://scoutevents.co.za/";
                           final String? tagsStr = _storageService.read<String>('selectedTags');
+
                           final List<String> tags = tagsStr != null && tagsStr.isNotEmpty ? tagsStr.split(',').map((e) => e.trim()).toList() : [];
-
                           final List<String> ignoredUsers = _storageService.read<List<String>>('hiddenUserIds') ?? [];
-
                           final List<String> inviteUser = _storageService.read<List<String>>('inviteUserId') ?? [];
 
                           final String title = _eventNameC.text.trim();

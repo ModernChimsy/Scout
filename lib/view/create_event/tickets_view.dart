@@ -22,17 +22,61 @@ class TicketsView extends StatefulWidget {
 class _TicketsViewState extends State<TicketsView> {
   final TextEditingController siteController = TextEditingController();
   final StorageService _storageService = StorageService();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _loadSavedSite();
+
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  void _onFocusChange() {
+    if (!_focusNode.hasFocus) {
+      Future.delayed(Duration(milliseconds: 100), () {
+        if (mounted) {
+          _saveAndExit();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    siteController.dispose();
+    super.dispose();
   }
 
   void _loadSavedSite() async {
     String? savedSite = _storageService.read<String>('ticketSite');
     if (savedSite != null) {
       siteController.text = savedSite;
+    }
+  }
+
+  Future<void> _saveAndExit() async {
+    final site = siteController.text.trim();
+
+    if (site.isEmpty) {
+      CustomToast.showToast("Please enter a ticket website URL.", isError: true);
+      return;
+    }
+
+    final uri = Uri.tryParse(site);
+
+    if (uri == null || !uri.hasScheme) {
+      CustomToast.showToast("Please enter a valid URL, including http:// or https://.", isError: true);
+      return;
+    }
+
+    await _storageService.write('ticketSite', site);
+    CustomToast.showToast("Ticket site saved.", isError: false);
+
+    if (Get.isDialogOpen == false) {
+      Get.back();
     }
   }
 
@@ -57,34 +101,20 @@ class _TicketsViewState extends State<TicketsView> {
               SizedBox(height: 6.h),
               CustomTextField(
                 controller: siteController,
+                focusNode: _focusNode,
                 keyboardType: TextInputType.url,
                 fillColor: Colors.transparent,
                 borderColor: Colors.grey,
-                hintText: "Enter ticket website URL",
+                hintText: "Enter ticket website URL (e.g., https://scoutevents.co.za)",
                 showObscure: false,
+                onSubmitted: (_) => _saveAndExit(),
               ),
               SizedBox(height: 15),
               Spacer(),
               SizedBox(
                 width: double.infinity,
                 height: 48.h,
-                child: CustomButtonWidget(
-                  bgColor: AppColors.btnColor,
-                  btnText: "Update",
-                  onTap: () async {
-                    final site = siteController.text.trim();
-
-                    if (site.isEmpty) {
-                      CustomToast.showToast("Please enter a ticket website URL.", isError: true);
-                      return;
-                    }
-
-                    // Save ticket site URL to local storage
-                    await _storageService.write('ticketSite', site);
-                    CustomToast.showToast("Ticket site saved.", isError: false);
-                  },
-                  iconWant: false,
-                ),
+                child: CustomButtonWidget(bgColor: AppColors.btnColor, btnText: "Update", onTap: _saveAndExit, iconWant: false),
               ),
               SizedBox(height: 26.h),
             ],

@@ -24,6 +24,7 @@ class AgesRestrictionView extends StatefulWidget {
 class _AgesRestrictionViewState extends State<AgesRestrictionView> {
   final TextEditingController ageController = TextEditingController();
   final StorageService _storageService = StorageService();
+  final FocusNode _focusNode = FocusNode();
 
   bool isAgeRestricted = false;
 
@@ -31,6 +32,26 @@ class _AgesRestrictionViewState extends State<AgesRestrictionView> {
   void initState() {
     super.initState();
     _loadSavedValues();
+
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    ageController.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (!_focusNode.hasFocus) {
+      Future.delayed(Duration(milliseconds: 100), () {
+        if (mounted) {
+          _saveAndExit();
+        }
+      });
+    }
   }
 
   void _loadSavedValues() async {
@@ -47,11 +68,32 @@ class _AgesRestrictionViewState extends State<AgesRestrictionView> {
     }
   }
 
+  Future<void> _saveAndExit() async {
+    final age = ageController.text.trim();
+
+    if (isAgeRestricted) {
+      if (age.isEmpty) {
+        CustomToast.showToast("Please enter a minimum age restriction.", isError: true);
+        return;
+      }
+      if (int.tryParse(age) == null || int.parse(age) < 1) {
+        CustomToast.showToast("Please enter a valid age (number greater than 0).", isError: true);
+        return;
+      }
+    }
+
+    await _storageService.write('minAgeRestriction', age);
+    await _storageService.write('isAgeRestricted', isAgeRestricted);
+
+    CustomToast.showToast("Age restriction saved.", isError: false);
+
+    Get.back();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
-          ThemeController.darkTheme;
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
@@ -70,11 +112,13 @@ class _AgesRestrictionViewState extends State<AgesRestrictionView> {
               SizedBox(height: 6.h),
               CustomTextField(
                 controller: ageController,
+                focusNode: _focusNode,
                 keyboardType: TextInputType.number,
                 fillColor: Colors.transparent,
                 borderColor: Colors.grey,
-                hintText: "Enter age restrictions",
+                hintText: "Enter minimum age restriction",
                 showObscure: false,
+                onSubmitted: (_) => _saveAndExit(),
               ),
               SizedBox(height: 15),
 
@@ -95,30 +139,7 @@ class _AgesRestrictionViewState extends State<AgesRestrictionView> {
               SizedBox(
                 width: double.infinity,
                 height: 48.h,
-                child: CustomButtonWidget(
-                  bgColor: AppColors.btnColor,
-                  btnText: "Update",
-                  onTap: () async {
-                    final age = ageController.text.trim();
-
-                    if (age.isEmpty && isAgeRestricted) {
-                      CustomToast.showToast(
-                        "Please enter an age restriction.",
-                        isError: true,
-                      );
-                      return;
-                    }
-
-                    await _storageService.write('minAgeRestriction', age);
-                    await _storageService.write('isAgeRestricted', isAgeRestricted);
-
-                    CustomToast.showToast(
-                      "Age restriction saved.",
-                      isError: false,
-                    );
-                  },
-                  iconWant: false,
-                ),
+                child: CustomButtonWidget(bgColor: AppColors.btnColor, btnText: "Update", onTap: _saveAndExit, iconWant: false),
               ),
               SizedBox(height: 26.h),
             ],
