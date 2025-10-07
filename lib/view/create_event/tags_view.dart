@@ -11,6 +11,7 @@ import 'package:restaurent_discount_app/uitilies/constant.dart';
 import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
+import 'create_event_view.dart';
 
 class TagsView extends StatefulWidget {
   const TagsView({super.key});
@@ -54,7 +55,7 @@ class _TagsViewState extends State<TagsView> {
       if (_selectedInterests.isNotEmpty) {
         Future.delayed(Duration(milliseconds: 100), () {
           if (mounted) {
-            _saveTagsAndExit();
+            // Todo Implement search tags here
           }
         });
       }
@@ -103,7 +104,7 @@ class _TagsViewState extends State<TagsView> {
     await _storageService.write('selectedTags', tagsString);
     CustomToast.showToast("Tag Saved", isError: false);
 
-    Get.back();
+    Get.to(() => CreateEventView());
   }
 
   @override
@@ -133,7 +134,7 @@ class _TagsViewState extends State<TagsView> {
                 hintText: "Search here.....",
                 showObscure: false,
                 prefixIcon: Icons.search,
-                onSubmitted: (_) => _saveTagsAndExit(),
+                // onSubmitted: (_) => _saveTagsAndExit(), // TODO: add search logic here
               ),
               SizedBox(height: 20.h),
               Expanded(

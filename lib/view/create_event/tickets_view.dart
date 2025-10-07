@@ -11,6 +11,7 @@ import 'package:restaurent_discount_app/uitilies/constant.dart';
 import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
+import 'create_event_view.dart';
 
 class TicketsView extends StatefulWidget {
   const TicketsView({super.key});
@@ -75,9 +76,7 @@ class _TicketsViewState extends State<TicketsView> {
     await _storageService.write('ticketSite', site);
     CustomToast.showToast("Ticket site saved.", isError: false);
 
-    if (Get.isDialogOpen == false) {
-      Get.back();
-    }
+    Get.to(() => CreateEventView());
   }
 
   @override

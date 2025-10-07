@@ -13,8 +13,8 @@ import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/get_user_controller.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
-
 import '../../common widget/custom text/custom_text_widget.dart';
+import 'create_event_view.dart';
 
 class HideEventPage extends StatefulWidget {
   const HideEventPage({super.key});
@@ -109,7 +109,7 @@ class _HideEventPageState extends State<HideEventPage> {
     _storageService.write('hiddenUserIds', selectedUserIds);
     CustomToast.showToast("Hidden users updated successfully!", isError: false);
 
-    Get.back();
+    Get.to(() => CreateEventView());
   }
 
   @override

@@ -9,6 +9,7 @@ import 'package:restaurent_discount_app/uitilies/app_colors.dart';
 import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
+import 'create_event_view.dart';
 
 class EventActivitiesPage extends StatefulWidget {
   const EventActivitiesPage({super.key});
@@ -66,7 +67,7 @@ class _EventActivitiesPageState extends State<EventActivitiesPage> {
 
   void _saveActivitiesAndExit() {
     if (activities.isEmpty) {
-      Get.back();
+      Get.to(() => const CreateEventView());
       return;
     }
 
@@ -80,7 +81,7 @@ class _EventActivitiesPageState extends State<EventActivitiesPage> {
     _storageService.write('eventActivities', activities);
     CustomToast.showToast("Activities Updated", isError: false);
 
-    Get.back();
+    Get.to(() => const CreateEventView());
   }
 
   void _addActivity() {

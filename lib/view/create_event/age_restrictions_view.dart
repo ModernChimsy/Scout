@@ -13,6 +13,7 @@ import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/view/create_event/widget/toogle_for_event.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
+import 'create_event_view.dart';
 
 class AgesRestrictionView extends StatefulWidget {
   const AgesRestrictionView({super.key});
@@ -87,7 +88,7 @@ class _AgesRestrictionViewState extends State<AgesRestrictionView> {
 
     CustomToast.showToast("Age restriction saved.", isError: false);
 
-    Get.back();
+    Get.to(() => CreateEventView());
   }
 
   @override
