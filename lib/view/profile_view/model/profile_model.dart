@@ -1,22 +1,13 @@
 class ProfileModel {
-  ProfileModel({
-     this.success,
-     this.message,
-     this.data,
-  });
+  ProfileModel({this.success, this.message, this.data});
 
   final bool? success;
   final String? message;
   final Data? data;
 
-  factory ProfileModel.fromJson(Map<String, dynamic> json){
-    return ProfileModel(
-      success: json["success"],
-      message: json["message"],
-      data: json["data"] == null ? null : Data.fromJson(json["data"]),
-    );
+  factory ProfileModel.fromJson(Map<String, dynamic> json) {
+    return ProfileModel(success: json["success"], message: json["message"], data: json["data"] == null ? null : Data.fromJson(json["data"]));
   }
-
 }
 
 class Data {
@@ -84,7 +75,7 @@ class Data {
   final List<dynamic> interestEvents;
   final List<Event> interestedEvents;
 
-  factory Data.fromJson(Map<String, dynamic> json){
+  factory Data.fromJson(Map<String, dynamic> json) {
     return Data(
       id: json["id"],
       firstName: json["firstName"],
@@ -118,7 +109,6 @@ class Data {
       interestedEvents: json["interestedEvents"] == null ? [] : List<Event>.from(json["interestedEvents"]!.map((x) => Event.fromJson(x))),
     );
   }
-
 }
 
 class Event {
@@ -166,7 +156,7 @@ class Event {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  factory Event.fromJson(Map<String, dynamic> json){
+  factory Event.fromJson(Map<String, dynamic> json) {
     return Event(
       id: json["id"],
       userId: json["userId"],
@@ -190,35 +180,21 @@ class Event {
       updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
     );
   }
-
 }
 
 class Location {
-  Location({
-    required this.type,
-    required this.coordinates,
-  });
+  Location({required this.type, required this.coordinates});
 
   final String? type;
   final List<double> coordinates;
 
-  factory Location.fromJson(Map<String, dynamic> json){
-    return Location(
-      type: json["type"],
-      coordinates: json["coordinates"] == null ? [] : List<double>.from(json["coordinates"]!.map((x) => x)),
-    );
+  factory Location.fromJson(Map<String, dynamic> json) {
+    return Location(type: json["type"], coordinates: json["coordinates"] == null ? [] : List<double>.from(json["coordinates"]!.map((x) => x)));
   }
-
 }
 
 class Follower {
-  Follower({
-    required this.id,
-    required this.followerId,
-    required this.followingId,
-    required this.createdAt,
-    required this.updatedAt,
-  });
+  Follower({required this.id, required this.followerId, required this.followingId, required this.createdAt, required this.updatedAt});
 
   final String? id;
   final String? followerId;
@@ -226,7 +202,7 @@ class Follower {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  factory Follower.fromJson(Map<String, dynamic> json){
+  factory Follower.fromJson(Map<String, dynamic> json) {
     return Follower(
       id: json["id"],
       followerId: json["followerId"],
@@ -235,5 +211,4 @@ class Follower {
       updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
     );
   }
-
 }
