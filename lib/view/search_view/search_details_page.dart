@@ -17,6 +17,7 @@ import 'package:restaurent_discount_app/view/search_view/controller/location_fil
 import 'package:restaurent_discount_app/view/search_view/widget/date_range_widget.dart';
 import 'package:restaurent_discount_app/view/search_view/widget/location_page.dart';
 import 'package:restaurent_discount_app/view/search_view/widget/categories_filter_page.dart';
+import '../../common widget/custom text/custom_text_widget.dart';
 
 class SearchDetailsPage extends StatefulWidget {
   final String? tag;
