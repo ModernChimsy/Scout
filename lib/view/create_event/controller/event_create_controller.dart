@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import 'package:restaurent_discount_app/common%20widget/successfull_page_for_all.dart';
 import 'package:restaurent_discount_app/uitilies/api/api_url.dart';
 import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
@@ -13,6 +14,8 @@ import 'package:restaurent_discount_app/uitilies/api/base_client.dart';
 import 'package:restaurent_discount_app/auth/token_manager.dart';
 
 class EventCreateController extends GetxController {
+  static final log = Logger();
+
   var isLoading = false.obs;
 
   Future<void> createEvent({
@@ -72,10 +75,11 @@ class EventCreateController extends GetxController {
       );
 
       dynamic json = await BaseClient.handleResponse(response);
-
-      // --- 4. Process Success ---
       if (json != null && json['success'] == true) {
-        CustomToast.showToast("🎉 Event created successfully!");
+        CustomToast.showToast("Event created successfully!");
+
+        final _storageService = Get.find<StorageService>();
+        await _storageService.clearEventCreationData();
 
         Get.offAll(
           () => SuccesfullyPageForAll(
@@ -90,14 +94,14 @@ class EventCreateController extends GetxController {
         throw json['message'] ?? 'Event creation failed with unknown error.';
       }
     } catch (e) {
-      print('❌ Error: $e');
+      log.e('❌ Error: $e');
+
       CustomToast.showToast(e.toString(), isError: true);
     } finally {
       isLoading(false);
     }
   }
 
-  /// Executes an authenticated multipart POST request.
   Future<http.Response> _executeAuthenticatedMultipartRequest({
     required String api,
     required Map<String, String> bodyFields,
@@ -106,34 +110,24 @@ class EventCreateController extends GetxController {
   }) async {
     final uri = Uri.parse(api);
 
-    // 🎯 FIX: Use TokenManager (or an equivalent structure) to get the token,
-    // which aligns with BaseClient's methods. We initialize a static instance
-    // here to match the TokenManager pattern often used in BaseClient.
     final TokenManager _tokenManager = TokenManager();
-    String? accessToken = await _tokenManager.getAccessToken(); // 🎯 GET TOKEN CONSISTENTLY
+    String? accessToken = await _tokenManager.getAccessToken();
 
     final request = http.MultipartRequest('POST', uri);
 
-    // Set Authorization header for authentication
     if (accessToken != null && accessToken.isNotEmpty) {
       request.headers['Authorization'] = 'Bearer $accessToken';
     } else {
-      // Best practice: throw an error if the token is missing for a protected route
       throw "Authentication token is missing. Please log in again.";
     }
 
-    // Set standard headers
     request.headers['Accept'] = 'application/json';
-
-    // Add JSON data field
     request.fields.addAll(bodyFields);
 
-    // Add optional file
     if (file != null && file.existsSync()) {
       request.files.add(await http.MultipartFile.fromPath(fileKeyName, file.path, filename: file.path.split('/').last));
     }
 
-    // Send request and wait for stream conversion
     final streamedResponse = await request.send();
     return http.Response.fromStream(streamedResponse);
   }
