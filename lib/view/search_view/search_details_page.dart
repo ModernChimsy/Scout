@@ -59,8 +59,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
   String getPageTitle() {
     if (widget.searchQuery != null && widget.searchQuery!.isNotEmpty) {
       return 'Results for "${widget.searchQuery!.capitalizeFirst}"';
-    }
-    else if (selectedCategories.isNotEmpty) {
+    } else if (selectedCategories.isNotEmpty) {
       String capitalizedCategories = selectedCategories
           .map((category) => category.split(' ').map((word) => word.capitalizeFirst).join(' '))
           .join(', ');
@@ -68,7 +67,6 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
       if (selectedCategories.length == 1 && capitalizedCategories.isNotEmpty) {
         return capitalizedCategories;
       }
-
       return 'Category Events';
     }
     return 'Event Filter';
@@ -114,12 +112,37 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      String appBarTitle = 'Search';
       bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
       String categoryButtonTitle = getCategoryButtonTitle();
 
+      bool useSimpleSearchAppBar = widget.searchQuery == null || widget.searchQuery!.isEmpty;
+
+      PreferredSizeWidget appBarWidget;
+
+      if (useSimpleSearchAppBar) {
+        if (widget.tag != null && widget.tag!.isNotEmpty) {
+          appBarTitle = widget.tag!.capitalizeFirst ?? widget.tag!;
+        }
+
+        appBarWidget = AppBar(
+          forceMaterialTransparency: true,
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios, color: isDarkMode ? Colors.white : Colors.black, size: 20),
+            onPressed: () => Get.back(),
+          ),
+          title: CustomText(text: appBarTitle, color: isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
+          centerTitle: false,
+          backgroundColor: Colors.transparent,
+        );
+      } else {
+        appBarWidget = CustomAppBar(title: getPageTitle());
+      }
+
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
-        appBar: CustomAppBar(title: getPageTitle()),
+        appBar: appBarWidget,
         body: Padding(
           padding: AppPadding.bodyPadding,
           child: Column(
