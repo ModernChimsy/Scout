@@ -5,18 +5,12 @@ import 'package:restaurent_discount_app/uitilies/app_colors.dart';
 class CustomLoader extends StatelessWidget {
   final double size;
 
-  CustomLoader({
-    Key? key,
-    this.size = 50.0,
-  }) : super(key: key);
+  const CustomLoader({Key? key, this.size = 50.0}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: SpinKitFadingCircle(
-        color: AppColors.btnColor,
-        size: size,
-      ),
+      child: SpinKitFadingCircle(color: AppColors.btnColor, size: size),
     );
   }
 }

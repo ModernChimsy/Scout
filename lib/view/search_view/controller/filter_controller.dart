@@ -30,7 +30,7 @@ class FilterController extends GetxController {
 
       dynamic responseBody = await BaseClient.handleResponse(
         await BaseClient.getRequest(
-          api: ApiUrl.filterEvent(tag: effectiveTag, endDate: endDate, startDate: startDate, query: effectiveQuery),
+          api: ApiUrl.filterEvent(page: 1, tag: effectiveTag, endDate: endDate, startDate: startDate, query: effectiveQuery),
         ),
       );
 

@@ -1,9 +1,13 @@
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:restaurent_discount_app/view/profile_view/model/my_saved_model.dart';
-import '../../../../uitilies/api/api_url.dart';
-import '../../../../uitilies/api/base_client.dart';
+import 'package:restaurent_discount_app/uitilies/constant.dart';
+import 'package:restaurent_discount_app/uitilies/api/api_url.dart';
+import 'package:restaurent_discount_app/uitilies/api/base_client.dart';
 
 class GetMyEventController extends GetxController {
+  static final log = Logger();
+
   var isLoading = false.obs;
   var nurseData = MyEventModel().obs;
 
@@ -17,9 +21,7 @@ class GetMyEventController extends GetxController {
     try {
       isLoading(true);
 
-      dynamic responseBody = await BaseClient.handleResponse(
-        await BaseClient.getRequest(api: ApiUrl.myEvent),
-      );
+      dynamic responseBody = await BaseClient.handleResponse(await BaseClient.getRequest(api: ApiUrl.myEvent(page: 1, limit: Constant.perPage)));
 
       if (responseBody != null) {
         nurseData.value = MyEventModel.fromJson(responseBody);
@@ -27,7 +29,7 @@ class GetMyEventController extends GetxController {
         throw 'Failed to fetch cart data!';
       }
     } catch (e) {
-      print("Error occurred: $e");
+      log.e("🧩 Error occurred: $e");
     } finally {
       isLoading(false);
     }
