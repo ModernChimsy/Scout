@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Expanded(
               child: Obx(() {
-                // For You
+                // Tab - For You
                 if (_currentIndex == 0) {
                   final eventList = _allEventController.eventList;
 
@@ -207,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }
 
-                // Friends Tab
+                // Tab - Friends
                 if (_currentIndex == 1) {
                   final eventList = _friendsEventController.eventList;
 
@@ -259,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }
 
-                // Today Tab
+                // Tab - Today
                 if (_currentIndex == 2) {
                   final eventList = _todayEventController.eventList;
 
