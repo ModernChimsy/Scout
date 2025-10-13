@@ -26,4 +26,24 @@ class StorageService {
   Future<void> clear() async {
     await _box.erase();
   }
+
+  // Clear event-specific temporary data
+  Future<void> clearEventCreationData() async {
+    final keysToClear = [
+      'ownAlcohol',
+      'coatCheck',
+      'eventPrivate',
+      'isAgeRestricted',
+      'minAgeRestriction',
+      'ticketSite',
+      'selectedTags',
+      'hiddenUserIds',
+      'inviteUserId',
+      'eventActivities',
+    ];
+
+    for (String key in keysToClear) {
+      await remove(key);
+    }
+  }
 }

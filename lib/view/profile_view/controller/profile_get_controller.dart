@@ -7,7 +7,6 @@ import '../../../uitilies/api/base_client.dart';
 import '../model/profile_model.dart';
 
 class ProfileGetController extends GetxController {
-
   final log = Logger();
 
   var isLoading = false.obs;
@@ -23,14 +22,11 @@ class ProfileGetController extends GetxController {
     try {
       isLoading(true);
 
-      dynamic responseBody = await BaseClient.handleResponse(
-        await BaseClient.getRequest(api: ApiUrl.getProfile),
-      );
+      dynamic responseBody = await BaseClient.handleResponse(await BaseClient.getRequest(api: ApiUrl.getProfile));
 
       if (responseBody['success'] == true) {
         profile.value = ProfileModel.fromJson(responseBody);
         log.d("🧩 Profile fetched: ${profile.value}");
-
       } else {
         throw 'Failed to load profile data: ${responseBody['message']}';
       }

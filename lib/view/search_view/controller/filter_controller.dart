@@ -14,9 +14,23 @@ class FilterController extends GetxController {
     try {
       isLoading(true);
 
+      String? effectiveQuery = query;
+      String effectiveTag = tag;
+
+      if (effectiveTag.isNotEmpty) {
+        effectiveQuery = effectiveTag.replaceAll(',', ' ');
+        effectiveTag = "";
+      } else if (query != null && query.isNotEmpty) {
+        effectiveQuery = query;
+      }
+
+      if (effectiveTag.isEmpty) {
+        effectiveTag = "";
+      }
+
       dynamic responseBody = await BaseClient.handleResponse(
         await BaseClient.getRequest(
-          api: ApiUrl.filterEvent(tag: tag, endDate: endDate, startDate: startDate, query: query),
+          api: ApiUrl.filterEvent(page: 1, tag: effectiveTag, endDate: endDate, startDate: startDate, query: effectiveQuery),
         ),
       );
 

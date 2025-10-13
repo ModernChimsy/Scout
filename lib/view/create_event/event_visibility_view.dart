@@ -13,8 +13,8 @@ import 'package:restaurent_discount_app/view/create_event/hide_from_another_view
 import 'package:restaurent_discount_app/view/create_event/widget/event_card_widget.dart';
 import 'package:restaurent_discount_app/view/create_event/widget/toogle_for_event.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
-
-import '../profile_view/settings_view/invite_user_view.dart'; // ✅ Your StorageService
+import '../profile_view/settings_view/invite_user_view.dart';
+import 'create_event_view.dart';
 
 class EventVisibilityView extends StatefulWidget {
   const EventVisibilityView({super.key});
@@ -24,34 +24,36 @@ class EventVisibilityView extends StatefulWidget {
 }
 
 class _EventVisibilityViewState extends State<EventVisibilityView> {
-  bool rememberMe = false;
+  bool isPrivate = false;
   final StorageService _storageService = StorageService();
 
   @override
   void initState() {
     super.initState();
-    _loadRememberMe();
+    _loadPrivacySetting();
   }
 
-  void _loadRememberMe() async {
+  void _loadPrivacySetting() async {
     bool? savedValue = _storageService.read<bool>('eventPrivate');
     if (savedValue != null) {
       setState(() {
-        rememberMe = savedValue;
+        isPrivate = savedValue;
       });
     }
   }
 
-  void _saveRememberMe(bool value) async {
-    await _storageService.write(
-        'eventPrivate', value);
+  void _saveAndExit() async {
+    await _storageService.write('eventPrivate', isPrivate);
+
+    CustomToast.showToast("Event visibility updated to ${isPrivate ? 'Private' : 'Public'}", isError: false);
+
+    Get.to(() => CreateEventView());
   }
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
-          ThemeController.darkTheme;
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
@@ -66,12 +68,12 @@ class _EventVisibilityViewState extends State<EventVisibilityView> {
                 textColor: isDarkMode ? Colors.white : Colors.black,
                 color: isDarkMode ? Color(0xFF4B515580) : Color(0xFFFFF5F0),
                 title: "Event is private",
-                isChecked: rememberMe,
+                isChecked: isPrivate,
                 onChanged: (value) {
                   setState(() {
-                    rememberMe = value;
+                    isPrivate = value;
                   });
-                  _saveRememberMe(value); // ✅ Save toggle
+                  _storageService.write('eventPrivate', value);
                 },
               ),
               SizedBox(height: 20.h),
@@ -97,17 +99,7 @@ class _EventVisibilityViewState extends State<EventVisibilityView> {
               SizedBox(
                 width: double.infinity,
                 height: 48.h,
-                child: CustomButtonWidget(
-                  bgColor: AppColors.btnColor,
-                  btnText: "Update",
-                  onTap: () {
-                    _saveRememberMe(rememberMe); // ✅ Optional — re-save
-
-                    CustomToast.showToast("Privacy Setting Updated",
-                        isError: true);
-                  },
-                  iconWant: false,
-                ),
+                child: CustomButtonWidget(bgColor: AppColors.btnColor, btnText: "Update", onTap: _saveAndExit, iconWant: false),
               ),
               SizedBox(height: 10.h),
               SizedBox(height: 26.h),

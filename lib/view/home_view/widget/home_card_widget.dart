@@ -222,7 +222,7 @@ class _EventCardState extends State<EventCard> {
                                     onTap: () async {
                                       await _interestedPostController.addToInterest(eventId: widget.eventId ?? '');
 
-                                      _allEventController.getEvent();
+                                      _allEventController.getInitialEvents();
                                     },
                                     btnTextColor: isDarkMode ? Colors.white : Colors.black,
                                     iconWant: false,

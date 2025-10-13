@@ -4,13 +4,18 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import 'package:restaurent_discount_app/common%20widget/successfull_page_for_all.dart';
 import 'package:restaurent_discount_app/uitilies/api/api_url.dart';
 import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
 import 'package:restaurent_discount_app/view/bottom_navigation_bar_view/bottom_navigation_bar_view.dart';
+import 'package:restaurent_discount_app/uitilies/api/base_client.dart';
+import 'package:restaurent_discount_app/auth/token_manager.dart';
 
 class EventCreateController extends GetxController {
+  static final log = Logger();
+
   var isLoading = false.obs;
 
   Future<void> createEvent({
@@ -38,18 +43,7 @@ class EventCreateController extends GetxController {
     try {
       isLoading(true);
 
-      final uri = Uri.parse(ApiUrl.eventCreate);
-      final storageService = StorageService();
-      final accessToken = storageService.read<String>('accessToken');
-
-      final request = http.MultipartRequest('POST', uri);
-
-      if (accessToken != null && accessToken.isNotEmpty) {
-        request.headers['Authorization'] = 'Bearer $accessToken';
-        request.headers['Content-Type'] = 'multipart/form-data';
-      }
-
-      final Map<String, dynamic> bodyData = {
+      final Map<String, dynamic> rawBodyData = {
         "title": title,
         "content": content,
         "date": date,
@@ -71,68 +65,70 @@ class EventCreateController extends GetxController {
         "longitude": longitude,
       };
 
-      request.fields['data'] = jsonEncode(bodyData);
+      final Map<String, String> requestBody = {'data': jsonEncode(rawBodyData)};
 
-      if (eventFile != null) {
-        request.files.add(await http.MultipartFile.fromPath(
-          'file',
-          eventFile.path,
-          filename: eventFile.path.split('/').last,
-        ));
-      }
+      final http.Response response = await _executeAuthenticatedMultipartRequest(
+        api: ApiUrl.eventCreate,
+        bodyFields: requestBody,
+        file: eventFile,
+        fileKeyName: 'file',
+      );
 
-      print("🚀 Sending Request with fields: ${request.fields}");
+      dynamic json = await BaseClient.handleResponse(response);
+      if (json != null && json['success'] == true) {
+        CustomToast.showToast("Event created successfully!");
 
-      final response = await request.send();
-      final responseBody = await response.stream.bytesToString();
+        final _storageService = Get.find<StorageService>();
+        await _storageService.clearEventCreationData();
 
-      print('✅ Response status: ${response.statusCode}');
-      print('📦 Response body: $responseBody');
-
-      final json = jsonDecode(responseBody);
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        if (json['success'] == true) {
-          CustomToast.showToast("🎉 Event created successfully!");
-
-          Get.offAll(() => SuccesfullyPageForAll(
+        Get.offAll(
+          () => SuccesfullyPageForAll(
             title: "Event Created!",
             subTitle: "Your event is created successfully done.",
             onTap: () {
               Get.offAll(() => BottomNavBarExample());
             },
-          ));
-        } else {
-          _handleError(json);
-        }
+          ),
+        );
       } else {
-        _handleError(json);
+        throw json['message'] ?? 'Event creation failed with unknown error.';
       }
     } catch (e) {
-      print('❌ Error: $e');
-      CustomToast.showToast("Error: $e", isError: true);
+      log.e('❌ Error: $e');
+
+      CustomToast.showToast(e.toString(), isError: true);
     } finally {
       isLoading(false);
     }
   }
 
-  void _handleError(Map<String, dynamic> json) {
-    String errorMsg = json['message'] ?? "Something went wrong!";
+  Future<http.Response> _executeAuthenticatedMultipartRequest({
+    required String api,
+    required Map<String, String> bodyFields,
+    required File? file,
+    required String fileKeyName,
+  }) async {
+    final uri = Uri.parse(api);
 
-    if (json['errorDetails']?['issues'] != null &&
-        json['errorDetails']['issues'] is List) {
-      final List issues = json['errorDetails']['issues'];
-      if (issues.isNotEmpty) {
-        errorMsg = issues.map((e) => e['message']).join('\n');
-      }
-    } else if (json['error']?['issues'] != null &&
-        json['error']['issues'] is List) {
-      final List issues = json['error']['issues'];
-      if (issues.isNotEmpty) {
-        errorMsg = issues.map((e) => e['message']).join('\n');
-      }
+    final TokenManager _tokenManager = TokenManager();
+    String? accessToken = await _tokenManager.getAccessToken();
+
+    final request = http.MultipartRequest('POST', uri);
+
+    if (accessToken != null && accessToken.isNotEmpty) {
+      request.headers['Authorization'] = 'Bearer $accessToken';
+    } else {
+      throw "Authentication token is missing. Please log in again.";
     }
 
-    CustomToast.showToast(errorMsg, isError: true);
+    request.headers['Accept'] = 'application/json';
+    request.fields.addAll(bodyFields);
+
+    if (file != null && file.existsSync()) {
+      request.files.add(await http.MultipartFile.fromPath(fileKeyName, file.path, filename: file.path.split('/').last));
+    }
+
+    final streamedResponse = await request.send();
+    return http.Response.fromStream(streamedResponse);
   }
 }

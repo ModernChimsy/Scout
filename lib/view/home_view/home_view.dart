@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, unused_local_variable
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,7 +15,6 @@ import 'package:restaurent_discount_app/view/notification_view/notification_view
 import 'package:restaurent_discount_app/view/profile_view/controller/profile_get_controller.dart';
 import 'package:restaurent_discount_app/view/home_view/controller/all_event_controller.dart';
 import 'package:shimmer/shimmer.dart';
-
 import '../../common widget/no_data_found_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,18 +27,37 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   static final log = Logger();
 
-  int _currentIndex = 0;
-
+  final ScrollController _scrollController = ScrollController();
   final ProfileGetController _profileGetController = Get.put(ProfileGetController());
   final AllEventController _allEventController = Get.put(AllEventController());
   final TodayEventController _todayEventController = Get.put(TodayEventController());
   final FriendsEventController _friendsEventController = Get.put(FriendsEventController());
   final List<String> tabs = ['For You', 'Friends', 'Today'];
 
+  int _currentIndex = 0;
   @override
   void initState() {
     super.initState();
     _profileGetController.getProfile();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      if (_currentIndex == 0) {
+        _allEventController.fetchEvents();
+      } else if (_currentIndex == 1) {
+        _friendsEventController.fetchFriendsEvents();
+      } else if (_currentIndex == 2) {
+        _todayEventController.fetchTodayEvents();
+      }
+    }
   }
 
   @override
@@ -74,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       CustomText(text: 'Hello', color: isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
                       SizedBox(width: 10),
                       CustomText(
-                        text: '${_profileGetController.profile.value.data?.firstName ?? "User"}',
+                        text: _profileGetController.profile.value.data?.firstName ?? "User",
                         color: isDarkMode ? Colors.white : Colors.black,
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
@@ -107,11 +125,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         _currentIndex = index;
 
                         if (_currentIndex == 0) {
-                          _allEventController.getEvent();
+                          _allEventController.getInitialEvents();
                         } else if (_currentIndex == 2) {
-                          _todayEventController.getToday();
+                          _todayEventController.getInitialTodayEvents();
                         } else if (_currentIndex == 1) {
-                          _friendsEventController.getFriendsEvent();
+                          _friendsEventController.getInitialFriendsEvents();
                         }
                       });
                     },
@@ -134,134 +152,167 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Expanded(
               child: Obx(() {
-                if (_currentIndex == 1) {
-                  if (_friendsEventController.isLoading.value) {
+                // Tab - For You
+                if (_currentIndex == 0) {
+                  final eventList = _allEventController.eventList;
+
+                  if (_allEventController.isLoading.value && eventList.isEmpty) {
                     return CustomLoader();
                   }
 
-                  final eventList = _friendsEventController.nurseData.value.data ?? [];
+                  if (eventList.isEmpty && !_allEventController.isLoading.value) {
+                    return Center(child: NotFoundWidget(message: 'Oops! No Event Found'));
+                  }
 
-                  if (eventList.isEmpty) {
+                  return RefreshIndicator(
+                    onRefresh: _allEventController.getInitialEvents,
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      physics: BouncingScrollPhysics(),
+                      itemCount: eventList.length + (_allEventController.hasMore.value ? 1 : 0),
+                      itemBuilder: (_, index) {
+                        if (index == eventList.length) {
+                          return Center(
+                            child: Padding(padding: const EdgeInsets.all(12.0), child: CustomLoader()),
+                          );
+                        }
+
+                        final event = eventList[index];
+
+                        final interestedPeopleImages = (event.interestEvents)
+                            .map(
+                              (interestEvent) =>
+                                  (interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'),
+                            )
+                            .toList();
+
+                        log.d("🧩 eventId: ${event.id}");
+                        log.d("🧩 image: ${event.image}");
+
+                        return EventCard(
+                          eventId: event.id,
+                          image: (event.image != null && event.image!.isNotEmpty)
+                              ? event.image.toString()
+                              : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
+                          eventName: event.title ?? '',
+                          eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
+                          categories: event.tags,
+                          eventDescription: event.content ?? '',
+                          friendsInterested: event.interestEvents.length,
+                          onTap: () => Get.to(() => EventDetailPage(eventId: event.id!)),
+                          interestedPeopleImage: interestedPeopleImages,
+                        );
+                      },
+                    ),
+                  );
+                }
+
+                // Tab - Friends
+                if (_currentIndex == 1) {
+                  final eventList = _friendsEventController.eventList;
+
+                  if (_friendsEventController.isLoading.value && eventList.isEmpty) {
+                    return CustomLoader();
+                  }
+
+                  if (eventList.isEmpty && !_friendsEventController.isLoading.value) {
                     return Center(child: NotFoundWidget(message: 'Oops! Friends not Found'));
                   }
 
-                  ListView.builder(
-                    physics: BouncingScrollPhysics(),
-                    itemCount: eventList.length,
-                    itemBuilder: (_, index) {
-                      final event = eventList[index];
+                  return RefreshIndicator(
+                    onRefresh: _friendsEventController.getInitialFriendsEvents,
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      physics: BouncingScrollPhysics(),
+                      itemCount: eventList.length + (_friendsEventController.hasMore.value ? 1 : 0),
+                      itemBuilder: (_, index) {
+                        if (index == eventList.length) {
+                          return Center(
+                            child: Padding(padding: const EdgeInsets.all(12.0), child: CustomLoader()),
+                          );
+                        }
 
-                      final interestedPeopleImages = event.interestEvents
-                          .map(
-                            (interestEvent) =>
-                                interestEvent.user?.profilePicture ??
-                                'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
-                          )
-                          .toList();
+                        final event = eventList[index];
 
-                      log.d("🧩 eventId: ${event.id}");
-                      log.d("🧩 image: ${event.image}");
+                        final interestedPeopleImages = (event.interestEvents)
+                            .map(
+                              (interestEvent) =>
+                                  (interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'),
+                            )
+                            .toList();
 
-                      return EventCard(
-                        eventId: event.id,
-                        image: event.image.toString(),
-                        eventName: event.title ?? '',
-                        eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
-                        categories: event.tags,
-                        eventDescription: event.content ?? '',
-                        friendsInterested: event.interestEvents.length,
-                        onTap: () => Get.to(() => EventDetailPage(eventId: event.id)),
-                        interestedPeopleImage: interestedPeopleImages,
-                      );
-                    },
+                        log.d("🧩 eventId: ${event.id},  image: ${event.image}");
+
+                        return EventCard(
+                          eventId: event.id,
+                          image: event.image.toString(),
+                          eventName: event.title ?? '',
+                          eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
+                          categories: event.tags,
+                          eventDescription: event.content ?? '',
+                          friendsInterested: event.interestEvents.length,
+                          onTap: () => Get.to(() => EventDetailPage(eventId: event.id!)),
+                          interestedPeopleImage: interestedPeopleImages,
+                        );
+                      },
+                    ),
                   );
                 }
 
+                // Tab - Today
                 if (_currentIndex == 2) {
-                  if (_todayEventController.isLoading.value) {
+                  final eventList = _todayEventController.eventList;
+
+                  if (_todayEventController.isLoading.value && eventList.isEmpty) {
                     return CustomLoader();
                   }
 
-                  final eventList = _todayEventController.nurseData.value.data ?? [];
-
-                  if (eventList.isEmpty) {
+                  if (eventList.isEmpty && !_todayEventController.isLoading.value) {
                     return Center(child: NotFoundWidget(message: 'Oops! Today Event not Found'));
                   }
 
-                  ListView.builder(
-                    physics: BouncingScrollPhysics(),
-                    itemCount: eventList.length,
-                    itemBuilder: (_, index) {
-                      final event = eventList[index];
+                  return RefreshIndicator(
+                    onRefresh: _todayEventController.getInitialTodayEvents,
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      physics: BouncingScrollPhysics(),
+                      itemCount: eventList.length + (_todayEventController.hasMore.value ? 1 : 0),
+                      itemBuilder: (_, index) {
+                        if (index == eventList.length) {
+                          return Center(
+                            child: Padding(padding: const EdgeInsets.all(12.0), child: CustomLoader()),
+                          );
+                        }
 
-                      final interestedPeopleImages = event.interestEvents
-                          .map(
-                            (interestEvent) =>
-                                interestEvent.user?.profilePicture ??
-                                'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
-                          )
-                          .toList();
+                        final event = eventList[index];
 
-                      log.d("🧩 eventId: ${event.id}");
-                      log.d("🧩 image: ${event.image}");
+                        final interestedPeopleImages = (event.interestEvents)
+                            .map(
+                              (interestEvent) =>
+                                  (interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'),
+                            )
+                            .toList();
 
-                      return EventCard(
-                        eventId: event.id,
-                        image: event.image.toString(),
-                        eventName: event.title ?? '',
-                        eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
-                        categories: event.tags,
-                        eventDescription: event.content ?? '',
-                        friendsInterested: event.interestEvents.length,
-                        onTap: () => Get.to(() => EventDetailPage(eventId: event.id)),
-                        interestedPeopleImage: interestedPeopleImages,
-                      );
-                    },
+                        log.d("🧩 eventId: ${event.id}");
+                        log.d("🧩 image: ${event.image}");
+
+                        return EventCard(
+                          eventId: event.id,
+                          image: event.image.toString(),
+                          eventName: event.title ?? '',
+                          eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
+                          categories: event.tags,
+                          eventDescription: event.content ?? '',
+                          friendsInterested: event.interestEvents.length,
+                          onTap: () => Get.to(() => EventDetailPage(eventId: event.id!)),
+                          interestedPeopleImage: interestedPeopleImages,
+                        );
+                      },
+                    ),
                   );
                 }
 
-                if (_allEventController.isLoading.value) {
-                  return CustomLoader();
-                }
-
-                final eventList = _allEventController.nurseData.value.data ?? [];
-
-                if (eventList.isEmpty) {
-                  return Center(child: NotFoundWidget(message: 'Oops! No Event Found'));
-                }
-
-                return ListView.builder(
-                  physics: BouncingScrollPhysics(),
-                  itemCount: eventList.length,
-                  itemBuilder: (_, index) {
-                    final event = eventList[index];
-
-                    final interestedPeopleImages = event.interestEvents
-                        .map(
-                          (interestEvent) =>
-                              interestEvent.user?.profilePicture ??
-                              'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
-                        )
-                        .toList();
-
-                    log.d("🧩 eventId: ${event.id}");
-                    log.d("🧩 image: ${event.image}");
-
-                    return EventCard(
-                      eventId: event.id,
-                      image: (event.image != null && event.image!.isNotEmpty)
-                          ? event.image.toString()
-                          : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
-                      eventName: event.title ?? '',
-                      eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
-                      categories: event.tags,
-                      eventDescription: event.content ?? '',
-                      friendsInterested: event.interestEvents.length,
-                      onTap: () => Get.to(() => EventDetailPage(eventId: event.id)),
-                      interestedPeopleImage: interestedPeopleImages,
-                    );
-                  },
-                );
+                return Container();
               }),
             ),
           ],
