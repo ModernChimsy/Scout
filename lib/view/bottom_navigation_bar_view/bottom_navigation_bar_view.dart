@@ -45,60 +45,67 @@ class _BottomNavBarExampleState extends State<BottomNavBarExample> {
       String profilePictureUrl = _profileGetController.profile.value.data?.profilePicture ?? '';
       String finalProfilePictureUrl = profilePictureUrl.isEmpty ? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png' : profilePictureUrl;
 
-      return Scaffold(
-        backgroundColor: isDarkMode ? Colors.black : Colors.white,
-        body: _pages[_currentIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: _onItemTapped,
-          type: BottomNavigationBarType.fixed,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
+      return Theme(
+        data: Theme.of(context).copyWith(highlightColor: Colors.transparent, splashColor: Colors.transparent),
+        child: Scaffold(
           backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          elevation: 0,
-          items: [
-            // Home
-            BottomNavigationBarItem(
-              icon: Icon(_currentIndex == 0 ? _activeIcons[0] : _regularIcons[0], color: _currentIndex == 0 ? activeItemColor : itemColor),
-              label: '',
-            ),
-            // Search
-            BottomNavigationBarItem(
-              icon: Icon(_currentIndex == 1 ? _activeIcons[1] : _regularIcons[1], color: _currentIndex == 1 ? activeItemColor : itemColor),
-              label: '',
-            ),
-            // Create Event
-            BottomNavigationBarItem(
-              icon: Icon(_currentIndex == 2 ? _activeIcons[2] : _regularIcons[2], color: _currentIndex == 2 ? activeItemColor : itemColor),
-              label: '',
-            ),
-            // 3: Bookmarks
-            BottomNavigationBarItem(
-              icon: Icon(_currentIndex == 3 ? _activeIcons[3] : _regularIcons[3], color: _currentIndex == 3 ? activeItemColor : itemColor),
-              label: '',
-            ),
-            // 4: Profile
-            BottomNavigationBarItem(
-              icon: Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: _currentIndex == 4 ? Border.all(color: activeItemColor, width: 2) : null,
-                ),
-                child: ClipOval(
-                  child: Image.network(
-                    finalProfilePictureUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(Icons.person, color: itemColor);
-                    },
+          body: _pages[_currentIndex],
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: _onItemTapped,
+            selectedItemColor: Colors.transparent,
+            unselectedItemColor: Colors.transparent,
+
+            type: BottomNavigationBarType.fixed,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            backgroundColor: isDarkMode ? Colors.black : Colors.white,
+            elevation: 0,
+            items: [
+              // 0: Home (Icons Array Index 0)
+              BottomNavigationBarItem(
+                icon: Icon(_currentIndex == 0 ? _activeIcons[0] : _regularIcons[0], color: _currentIndex == 0 ? activeItemColor : itemColor),
+                label: '',
+              ),
+              // 1: Search (Icons Array Index 1)
+              BottomNavigationBarItem(
+                icon: Icon(_currentIndex == 1 ? _activeIcons[1] : _regularIcons[1], color: _currentIndex == 1 ? activeItemColor : itemColor),
+                label: '',
+              ),
+              // 2: Create Event (Icons Array Index 2)
+              BottomNavigationBarItem(
+                icon: Icon(_currentIndex == 2 ? _activeIcons[2] : _regularIcons[2], color: _currentIndex == 2 ? activeItemColor : itemColor),
+                label: '',
+              ),
+              // 3: Bookmarks (Icons Array Index 3)
+              BottomNavigationBarItem(
+                icon: Icon(_currentIndex == 3 ? _activeIcons[3] : _regularIcons[3], color: _currentIndex == 3 ? activeItemColor : itemColor),
+                label: '',
+              ),
+              // 4: Profile
+              BottomNavigationBarItem(
+                icon: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    // Border applied only when active
+                    border: _currentIndex == 4 ? Border.all(color: activeItemColor, width: 2) : null,
+                  ),
+                  child: ClipOval(
+                    child: Image.network(
+                      finalProfilePictureUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.person, color: itemColor);
+                      },
+                    ),
                   ),
                 ),
+                label: '',
               ),
-              label: '',
-            ),
-          ],
+            ],
+          ),
         ),
       );
     });
