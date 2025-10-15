@@ -3,15 +3,15 @@ import 'package:get/get.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 
 class AppColors {
-  static Color mainColor = Color(0xFF0065FF);
-  static Color btnColor = Color(0xFFFB6012);
-  static Color btnBorderColor = Color(0xFF050505);
+  static Color mainColor = const Color(0xFF0065FF);
+  static Color btnColor = const Color(0xFFFB6012);
+  static Color btnBorderColor = const Color(0xFF050505);
 
   static Color get bgColor {
     if (Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme) {
       return Colors.black;
     } else {
-      return Color(0xFFFFFFFF);
+      return const Color(0xFFFFFFFF);
     }
   }
 
