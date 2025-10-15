@@ -23,7 +23,7 @@ class WelcomeView extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned.fill(child: Image.asset('assets/images/bg.png', fit: BoxFit.cover)),
+          Positioned.fill(child: Image.asset('assets/images/bg_new.png', fit: BoxFit.cover)),
           Center(
             child: Column(
               children: [
