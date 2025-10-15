@@ -19,28 +19,18 @@ class BottomNavBarExample extends StatefulWidget {
 
 class _BottomNavBarExampleState extends State<BottomNavBarExample> {
   int _currentIndex = 0;
-  final List<Widget> _pages = [
-    HomeScreen(),
-    EventCategoryScreen(),
-    BookmarksView(),
-    ProfileScreen()
-  ];
+  final List<Widget> _pages = [HomeScreen(), EventCategoryScreen(), BookmarksView(), ProfileScreen()];
 
-  final ProfileGetController _profileGetController =
-      Get.put(ProfileGetController());
+  final ProfileGetController _profileGetController = Get.put(ProfileGetController());
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
-          ThemeController.darkTheme;
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
-      String profilePictureUrl =
-          _profileGetController.profile.value.data?.profilePicture ?? '';
+      String profilePictureUrl = _profileGetController.profile.value.data?.profilePicture ?? '';
 
-      String finalProfilePictureUrl = profilePictureUrl.isEmpty
-          ? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'
-          : profilePictureUrl;
+      String finalProfilePictureUrl = profilePictureUrl.isEmpty ? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png' : profilePictureUrl;
 
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
@@ -53,33 +43,21 @@ class _BottomNavBarExampleState extends State<BottomNavBarExample> {
             });
           },
           items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              label: '', // Empty label
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              label: '', // Empty label
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark_outline_outlined),
-              label: '', // Empty label
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: ''),
+            BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
+            BottomNavigationBarItem(icon: Icon(Icons.bookmark_outline_outlined), label: ''),
             BottomNavigationBarItem(
               icon: Container(
-                width: 40, // Size of the circle
+                width: 40,
                 height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
                   border: Border.all(color: AppColors.btnColor, width: 3),
                 ),
-                child: CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      finalProfilePictureUrl), // Dynamically set profile picture
-                ),
+                child: CircleAvatar(backgroundImage: NetworkImage(finalProfilePictureUrl)),
               ),
-              label: '', // Empty label
+              label: '',
             ),
           ],
           selectedItemColor: AppColors.btnColor,
