@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_button_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_text_filed.dart';
@@ -25,11 +26,16 @@ class CreateAccountView extends StatelessWidget {
   final TextEditingController passwordC = TextEditingController();
   final TextEditingController confirmPassC = TextEditingController();
 
+  static const String orangeLogoPath = "assets/icon/scout_logo_orange.svg";
+  static const String whiteLogoPath = "assets/icon/scout_logo_white.svg";
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
-          ThemeController.darkTheme;
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
+
+      // Determine which logo color to use based on the theme
+      String logoAsset = isDarkMode ? whiteLogoPath : orangeLogoPath;
 
       return Scaffold(
         body: Stack(
@@ -42,14 +48,9 @@ class CreateAccountView extends StatelessWidget {
                       : LinearGradient(
                           begin: Alignment.topRight,
                           end: Alignment.bottomLeft,
-                          colors: [
-                            Color(0xFFFB6012).withOpacity(0.1),
-                            Color(0xFFFFA07A).withOpacity(0.1),
-                          ],
+                          colors: [Color(0xFFFB6012).withOpacity(0.1), Color(0xFFFFA07A).withOpacity(0.1)],
                         ),
-                  color: isDarkMode
-                      ? AppColors.bgColor
-                      : Colors.transparent, // Dark background color
+                  color: isDarkMode ? AppColors.bgColor : Colors.transparent, // Dark background color
                 ),
               ),
             ),
@@ -61,10 +62,7 @@ class CreateAccountView extends StatelessWidget {
                       : LinearGradient(
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
-                          colors: [
-                            Colors.white.withOpacity(0.5),
-                            Colors.white,
-                          ],
+                          colors: [Colors.white.withOpacity(0.5), Colors.white],
                         ),
                 ),
               ),
@@ -80,25 +78,27 @@ class CreateAccountView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Image(image: AssetImage("assets/images/long_logo.png")),
+                      // *** FIX: Use SvgPicture.asset for SVG files ***
+                      // Removed: Image(image: AssetImage("assets/icon/scout_logo_orange.svg"))
+                      SvgPicture.asset(
+                        orangeLogoPath, // Use the orange logo path
+                        height: 30.h, // Adjust size as needed
+                        // If you need to swap the logo based on theme:
+                        // SvgPicture.asset(logoAsset, height: 30.h),
+                      ),
+
+                      // Image(image: AssetImage("assets/images/long_logo.png")),
 
                       // Step Indicator using Obx
                       Obx(() {
                         return Row(
                           children: List.generate(3, (index) {
-                            bool isActive =
-                                index < stepController.currentStep.value;
+                            bool isActive = index < stepController.currentStep.value;
                             return Container(
                               margin: EdgeInsets.only(left: 6.w),
-                              width:
-                                  isActive ? 19.w : 10.w, // Larger active step
+                              width: isActive ? 19.w : 10.w, // Larger active step
                               height: isActive ? 14.h : 10.h,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: isActive
-                                    ? AppColors.btnColor
-                                    : Colors.grey.shade300,
-                              ),
+                              decoration: BoxDecoration(shape: BoxShape.circle, color: isActive ? AppColors.btnColor : Colors.grey.shade300),
                             );
                           }),
                         );
@@ -109,31 +109,17 @@ class CreateAccountView extends StatelessWidget {
                   SizedBox(height: 30.h),
 
                   // Welcome Text
-                  CustomText(
-                    text: "Let’s begin",
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
+                  CustomText(text: "Let’s begin", fontSize: 20.sp, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.white : Colors.black),
 
                   SizedBox(height: 5.h),
 
                   // Subtitle
-                  CustomText(
-                    text: "Create your login details below",
-                    fontSize: 14.sp,
-                    color: isDarkMode ? Colors.white : Colors.black54,
-                  ),
+                  CustomText(text: "Create your login details below", fontSize: 14.sp, color: isDarkMode ? Colors.white : Colors.black54),
 
                   SizedBox(height: 30.h),
 
                   // Email Field
-                  CustomText(
-                    text: "Email",
-                    fontSize: 14.sp,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  CustomText(text: "Email", fontSize: 14.sp, color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500),
                   SizedBox(height: 6.h),
                   CustomTextField(
                     controller: emailC,
@@ -141,17 +127,14 @@ class CreateAccountView extends StatelessWidget {
                     borderColor: Colors.grey,
                     hintText: "Enter your email",
                     showObscure: false,
+                    // hintTextColo: isDarkMode ? Colors.white70 : Colors.black54, // Set hint color based on theme
+                    // iconColor: itemColor, // Assuming itemColor is defined in the outer scope or should be local
                   ),
 
                   SizedBox(height: 10.h),
 
                   // Password Field
-                  CustomText(
-                    text: "Password",
-                    fontSize: 14.sp,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  CustomText(text: "Password", fontSize: 14.sp, color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500),
                   SizedBox(height: 6.h),
                   CustomTextField(
                     controller: passwordC,
@@ -159,17 +142,14 @@ class CreateAccountView extends StatelessWidget {
                     borderColor: Colors.grey,
                     hintText: "Enter your password",
                     showObscure: true,
+                    hintTextColo: isDarkMode ? Colors.white70 : Colors.black54,
+                    // iconColor: itemColor,
                   ),
 
                   SizedBox(height: 10.h),
 
                   // Confirm Password Field
-                  CustomText(
-                    text: "Confirm Password",
-                    fontSize: 14.sp,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  CustomText(text: "Confirm Password", fontSize: 14.sp, color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500),
                   SizedBox(height: 6.h),
                   CustomTextField(
                     controller: confirmPassC,
@@ -177,6 +157,8 @@ class CreateAccountView extends StatelessWidget {
                     borderColor: Colors.grey,
                     hintText: "Enter confirm password",
                     showObscure: true,
+                    hintTextColo: isDarkMode ? Colors.white70 : Colors.black54,
+                    // iconColor: itemColor,
                   ),
 
                   Spacer(),
@@ -192,22 +174,13 @@ class CreateAccountView extends StatelessWidget {
                         String password = passwordC.text;
                         String confirmPassword = confirmPassC.text;
 
-                        if (password.isEmpty || confirmPassword.isEmpty) {
-                          CustomToast.showToast(
-                            "Please fill out all fields",
-                            isError: true,
-                          );
+                        if (emailC.text.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+                          CustomToast.showToast("Please fill out all fields", isError: true);
                         } else if (password != confirmPassword) {
-                          CustomToast.showToast(
-                            "Passwords do not match",
-                            isError: true,
-                          );
+                          CustomToast.showToast("Passwords do not match", isError: true);
                         } else {
                           stepController.nextStep();
-                          Get.to(() => TellUsAboutYou(
-                                email: emailC.text,
-                                password: passwordC.text,
-                              ));
+                          Get.to(() => TellUsAboutYou(email: emailC.text, password: passwordC.text));
                         }
                       },
                       iconWant: false,
@@ -221,10 +194,7 @@ class CreateAccountView extends StatelessWidget {
                     child: RichText(
                       text: TextSpan(
                         text: "Already have an account? ",
-                        style: GoogleFonts.poppins(
-                          fontSize: 14.sp,
-                          color: isDarkMode ? Colors.white : Colors.black,
-                        ),
+                        style: GoogleFonts.poppins(fontSize: 14.sp, color: isDarkMode ? Colors.white : Colors.black),
                         children: [
                           TextSpan(
                             text: "Sign in",
@@ -236,12 +206,8 @@ class CreateAccountView extends StatelessWidget {
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SignInView(),
-                                  ),
-                                );
+                                // Use Get.to for consistency with GetX
+                                Get.to(() => SignInView());
                               },
                           ),
                         ],

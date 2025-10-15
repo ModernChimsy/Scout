@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 
 class AppColors {
+  static Color scoutVividVermilion = const Color(0xFFFB6012); // using this as the main color across app
   static Color mainColor = const Color(0xFF0065FF);
   static Color btnColor = const Color(0xFFFB6012);
   static Color btnBorderColor = const Color(0xFF050505);
@@ -11,26 +12,19 @@ class AppColors {
     if (Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme) {
       return Colors.black;
     } else {
-      return const Color(0xFFFFFFFF);
+      return const Color(0xFFFFF5F0);
     }
   }
 
   // Gradient for background depending on the theme
   static Gradient get gradient {
     if (Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme) {
-      return LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Colors.black.withOpacity(0.7), Colors.black],
-      );
+      return LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.black.withOpacity(0.7), Colors.black]);
     } else {
       return LinearGradient(
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
-        colors: [
-          Colors.white.withOpacity(0.5),
-          Colors.white,
-        ], // Light gradient for light theme
+        colors: [Colors.white.withOpacity(0.5), Colors.white],
       );
     }
   }
