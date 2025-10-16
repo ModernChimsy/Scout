@@ -14,8 +14,7 @@ import 'package:restaurent_discount_app/view/auth_view/controller/step_controlle
 import 'package:restaurent_discount_app/view/auth_view/sign_in_view.dart';
 import 'package:restaurent_discount_app/view/auth_view/tell_us_about_view.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
-
-import '../../uitilies/custom_toast.dart';
+import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
 
 class CreateAccountView extends StatelessWidget {
   CreateAccountView({super.key});
@@ -27,6 +26,11 @@ class CreateAccountView extends StatelessWidget {
   final TextEditingController confirmPassC = TextEditingController();
 
   static const String orangeLogoPath = "assets/icon/scout_logo_orange.svg";
+
+  static final Color _inactiveIndicatorColor = Color(0xFFFB6012).withOpacity(0.3);
+
+  static const double _pillHeight = 6.0;
+  static const double _activePillWidth = 18.0;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +60,6 @@ class CreateAccountView extends StatelessWidget {
             Positioned.fill(
               child: Container(decoration: BoxDecoration(gradient: isDarkMode ? null : AppColors.gradient)),
             ),
-            // Foreground UI
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               child: Column(
@@ -67,20 +70,27 @@ class CreateAccountView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SvgPicture.asset(orangeLogoPath, height: 30.h),
+                      SvgPicture.asset(orangeLogoPath, height: 20.h),
 
                       Obx(() {
+                        final int currentStepIndex = stepController.currentStep.value - 1;
+
                         return Row(
                           children: List.generate(3, (index) {
-                            bool isActive = index < stepController.currentStep.value;
+                            bool isCurrent = index == currentStepIndex;
+
+                            final double height = _pillHeight.h;
+                            final double width = isCurrent ? _activePillWidth.w : _pillHeight.w;
+                            final BoxShape shape = isCurrent ? BoxShape.rectangle : BoxShape.circle;
+                            final BorderRadius? borderRadius = isCurrent ? BorderRadius.circular(height / 2) : null;
+
+                            Color color = isCurrent ? AppColors.btnColor : _inactiveIndicatorColor;
+
                             return Container(
                               margin: EdgeInsets.only(left: 6.w),
-                              width: isActive ? 19.w : 10.w,
-                              height: isActive ? 14.h : 10.h,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: isActive ? AppColors.scoutVividVermilion : Colors.grey.shade300,
-                              ),
+                              width: width,
+                              height: height,
+                              decoration: BoxDecoration(shape: shape, borderRadius: borderRadius, color: color),
                             );
                           }),
                         );
@@ -181,7 +191,7 @@ class CreateAccountView extends StatelessWidget {
                             text: "Sign in",
                             style: TextStyle(
                               fontSize: 14.sp,
-                              color: Colors.orange,
+                              color: AppColors.btnColor,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,
                             ),
