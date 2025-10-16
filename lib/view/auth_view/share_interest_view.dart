@@ -1,8 +1,9 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_button_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_text_filed.dart';
@@ -10,9 +11,8 @@ import 'package:restaurent_discount_app/uitilies/app_colors.dart';
 import 'package:restaurent_discount_app/uitilies/custom_loader.dart';
 import 'package:restaurent_discount_app/view/auth_view/controller/step_controller.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
-
-import '../../uitilies/custom_toast.dart';
-import 'controller/sign_up_controller.dart';
+import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
+import 'package:restaurent_discount_app/view/auth_view/controller/sign_up_controller.dart';
 
 class ShareInterestView extends StatefulWidget {
   final String fullName;
@@ -20,13 +20,7 @@ class ShareInterestView extends StatefulWidget {
   final String email;
   final String password;
 
-  const ShareInterestView({
-    super.key,
-    required this.fullName,
-    required this.userName,
-    required this.email,
-    required this.password,
-  });
+  const ShareInterestView({super.key, required this.fullName, required this.userName, required this.email, required this.password});
 
   @override
   State<ShareInterestView> createState() => _ShareInterestViewState();
@@ -52,8 +46,13 @@ class _ShareInterestViewState extends State<ShareInterestView> {
   ];
 
   List<String> _filteredInterests = [];
-  List<String> _selectedInterests = [];
+  final List<String> _selectedInterests = [];
   final TextEditingController _searchController = TextEditingController();
+
+  static const String orangeLogoPath = "assets/icon/scout_logo_orange.svg";
+  static final Color _inactiveIndicatorColor = AppColors.btnColor.withOpacity(0.3);
+  static const double _pillHeight = 6.0;
+  static const double _activePillWidth = 18.0;
 
   @override
   void initState() {
@@ -71,9 +70,7 @@ class _ShareInterestViewState extends State<ShareInterestView> {
   void _onSearchChanged() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredInterests = _interests
-          .where((item) => item.toLowerCase().contains(query))
-          .toList();
+      _filteredInterests = _interests.where((item) => item.toLowerCase().contains(query)).toList();
     });
   }
 
@@ -89,8 +86,10 @@ class _ShareInterestViewState extends State<ShareInterestView> {
 
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
-        ThemeController.darkTheme;
+    bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
+
+    Color textColor = isDarkMode ? Colors.white : Colors.black;
+    Color subtitleColor = isDarkMode ? Colors.white70 : Colors.black54;
 
     return Scaffold(
       body: Stack(
@@ -102,32 +101,16 @@ class _ShareInterestViewState extends State<ShareInterestView> {
                 gradient: isDarkMode
                     ? null
                     : LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
-                    Color(0xFFFB6012).withOpacity(0.1),
-                    Color(0xFFFFA07A).withOpacity(0.1),
-                  ],
-                ),
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                        colors: [AppColors.btnColor.withOpacity(0.1), Color(0xFFFFA07A).withOpacity(0.1)],
+                      ),
                 color: isDarkMode ? AppColors.bgColor : Colors.transparent,
               ),
             ),
           ),
           Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: isDarkMode
-                    ? null
-                    : LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    Colors.white.withOpacity(0.5),
-                    Colors.white,
-                  ],
-                ),
-              ),
-            ),
+            child: Container(decoration: BoxDecoration(gradient: isDarkMode ? null : AppColors.gradient)),
           ),
 
           Padding(
@@ -140,22 +123,25 @@ class _ShareInterestViewState extends State<ShareInterestView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Image(image: AssetImage("assets/images/long_logo.png")),
+                    SvgPicture.asset(orangeLogoPath, height: 20.h),
                     Obx(() {
+                      final int currentStepIndex = stepController.currentStep.value - 1;
                       return Row(
                         children: List.generate(3, (index) {
-                          bool isActive =
-                              index < stepController.currentStep.value;
+                          final bool isCurrent = index == currentStepIndex;
+
+                          final double height = _pillHeight.h;
+                          final double width = isCurrent ? _activePillWidth.w : _pillHeight.w;
+                          final BoxShape shape = isCurrent ? BoxShape.rectangle : BoxShape.circle;
+                          final BorderRadius? borderRadius = isCurrent ? BorderRadius.circular(height / 2) : null;
+
+                          final Color color = index <= currentStepIndex ? AppColors.btnColor : _inactiveIndicatorColor;
+
                           return Container(
                             margin: EdgeInsets.only(left: 6.w),
-                            width: isActive ? 19.w : 10.w,
-                            height: isActive ? 14.h : 10.h,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isActive
-                                  ? AppColors.btnColor
-                                  : Colors.grey.shade300,
-                            ),
+                            width: width,
+                            height: height,
+                            decoration: BoxDecoration(shape: shape, borderRadius: borderRadius, color: color),
                           );
                         }),
                       );
@@ -165,27 +151,22 @@ class _ShareInterestViewState extends State<ShareInterestView> {
                 SizedBox(height: 30.h),
 
                 // Title
-                CustomText(
-                  text: "Share your interests",
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
+                CustomText(text: "Share your interests", fontSize: 20.sp, fontWeight: FontWeight.bold, color: textColor),
                 SizedBox(height: 5.h),
                 CustomText(
                   textAlign: TextAlign.start,
-                  text:
-                  "Let’s personalise the events you see. You can update this later in the profile section.",
+                  text: "Let’s personalise the events you see. You can update this later in the profile section.",
                   fontSize: 14.sp,
-                  color: isDarkMode ? Colors.white : Colors.black54,
+                  color: subtitleColor,
                 ),
 
                 SizedBox(height: 20.h),
 
                 // Search
-                Text("Search",
-                    style: TextStyle(
-                        fontSize: 14.sp, fontWeight: FontWeight.w500)),
+                Text(
+                  "Search",
+                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: textColor),
+                ),
                 SizedBox(height: 6.h),
                 CustomTextField(
                   controller: _searchController,
@@ -194,64 +175,63 @@ class _ShareInterestViewState extends State<ShareInterestView> {
                   hintText: "Search here.....",
                   showObscure: false,
                   prefixIcon: Icons.search,
+                  hintTextColo: subtitleColor,
+                  iconColor: textColor,
                 ),
                 SizedBox(height: 20.h),
 
                 // Chips
-                Wrap(
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  children: _filteredInterests.map((interest) {
-                    bool isSelected = _selectedInterests.contains(interest);
-                    return ChoiceChip(
-                      label: Text(interest),
-                      selected: isSelected,
-                      onSelected: (_) => _toggleSelection(interest),
-                      selectedColor: AppColors.btnColor,
-                      backgroundColor: AppColors.btnColor.withOpacity(0.1),
-                      labelStyle: TextStyle(
-                        color: isDarkMode
-                            ? (isSelected ? Colors.black : Colors.white)
-                            : (isSelected ? Colors.white : Colors.black),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 12.w, vertical: 6.h),
-                      side: BorderSide.none,
-                    );
-                  }).toList(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Wrap(
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      children: _filteredInterests.map((interest) {
+                        bool isSelected = _selectedInterests.contains(interest);
+                        return ChoiceChip(
+                          label: Text(interest),
+                          selected: isSelected,
+                          onSelected: (_) => _toggleSelection(interest),
+                          selectedColor: AppColors.btnColor,
+                          backgroundColor: AppColors.btnColor.withOpacity(0.1),
+                          labelStyle: TextStyle(
+                            color: isDarkMode ? (isSelected ? Colors.black : Colors.white) : (isSelected ? Colors.white : Colors.black),
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                          side: BorderSide.none,
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 ),
-
-                Spacer(),
 
                 // Done Button
                 Obx(() {
                   return _registerController.isLoading.value
                       ? CustomLoader()
                       : SizedBox(
-                    width: double.infinity,
-                    height: 48.h,
-                    child: CustomButtonWidget(
-                      bgColor: AppColors.btnColor,
-                      btnText: "Done",
-                      onTap: () {
-                        if (_selectedInterests.isEmpty) {
-                          CustomToast.showToast(
-                              "Please select at least one interest.",
-                              isError: true);
-                          return;
-                        }
+                          width: double.infinity,
+                          height: 48.h,
+                          child: CustomButtonWidget(
+                            bgColor: AppColors.btnColor,
+                            btnText: "Done",
+                            onTap: () {
+                              if (_selectedInterests.isEmpty) {
+                                CustomToast.showToast("Please select at least one interest.", isError: true);
+                                return;
+                              }
 
-                        _registerController.register(
-                          firstName: widget.fullName,
-                          lastName: widget.userName,
-                          email: widget.email,
-                          password: widget.password,
-                          interests: _selectedInterests,
+                              _registerController.register(
+                                firstName: widget.fullName,
+                                lastName: widget.userName,
+                                email: widget.email,
+                                password: widget.password,
+                                interests: _selectedInterests,
+                              );
+                            },
+                            iconWant: false,
+                          ),
                         );
-                      },
-                      iconWant: false,
-                    ),
-                  );
                 }),
 
                 SizedBox(height: 10.h),
@@ -264,7 +244,15 @@ class _ShareInterestViewState extends State<ShareInterestView> {
                     bgColor: Colors.white,
                     btnText: "Skip",
                     btnTextColor: Colors.black,
-                    onTap: () {},
+                    onTap: () {
+                      _registerController.register(
+                        firstName: widget.fullName,
+                        lastName: widget.userName,
+                        email: widget.email,
+                        password: widget.password,
+                        interests: [],
+                      );
+                    },
                     iconWant: false,
                   ),
                 ),
@@ -277,4 +265,3 @@ class _ShareInterestViewState extends State<ShareInterestView> {
     );
   }
 }
-
