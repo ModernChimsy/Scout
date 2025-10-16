@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_button_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_text_filed.dart';
@@ -16,20 +17,22 @@ import 'package:restaurent_discount_app/view/create_event/controller/theme_contr
 class ForgetPasswordView extends StatelessWidget {
   ForgetPasswordView({super.key});
 
-  final ForgetPasswordController _forgetPasswordController =
-      Get.put(ForgetPasswordController());
+  final ForgetPasswordController _forgetPasswordController = Get.put(ForgetPasswordController());
   final TextEditingController _emailC = TextEditingController();
+
+  static const String orangeLogoPath = "assets/icon/scout_logo_orange.svg";
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
-          ThemeController.darkTheme;
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
+
+      Color textColor = isDarkMode ? Colors.white : Colors.black;
+      Color subtitleColor = isDarkMode ? Colors.white70 : Colors.black54;
 
       return Scaffold(
         body: Stack(
           children: [
-            // Gradient Background
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
@@ -38,33 +41,15 @@ class ForgetPasswordView extends StatelessWidget {
                       : LinearGradient(
                           begin: Alignment.topRight,
                           end: Alignment.bottomLeft,
-                          colors: [
-                            Color(0xFFFB6012).withOpacity(0.1),
-                            Color(0xFFFFA07A).withOpacity(0.1),
-                          ],
+                          colors: [AppColors.scoutVividVermilion.withOpacity(0.1), Color(0xFFFFA07A).withOpacity(0.1)],
                         ),
-                  color: isDarkMode
-                      ? AppColors.bgColor
-                      : Colors.transparent, // Dark background color
+                  color: isDarkMode ? AppColors.bgColor : Colors.transparent,
                 ),
               ),
             ),
 
             Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: isDarkMode
-                      ? null
-                      : LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            Colors.white.withOpacity(0.5),
-                            Colors.white,
-                          ],
-                        ),
-                ),
-              ),
+              child: Container(decoration: BoxDecoration(gradient: isDarkMode ? null : AppColors.gradient)),
             ),
 
             // Foreground UI
@@ -78,41 +63,28 @@ class ForgetPasswordView extends StatelessWidget {
                   // Logo and Progress Indicator
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Image(image: AssetImage("assets/images/long_logo.png")),
-                    ],
+                    children: [SvgPicture.asset(orangeLogoPath, height: 20.h)],
                   ),
 
                   SizedBox(height: 30.h),
 
                   // Welcome Text
-                  CustomText(
-                    text: "Forgot Password",
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
+                  CustomText(text: "Forgot Password", fontSize: 20.sp, fontWeight: FontWeight.bold, color: textColor),
 
                   SizedBox(height: 5.h),
 
                   // Subtitle
                   CustomText(
                     textAlign: TextAlign.start,
-                    text:
-                        "Enter the email address used to create your account.",
+                    text: "Enter the email address used to create your account.",
                     fontSize: 14.sp,
-                    color: isDarkMode ? Colors.white : Colors.black54,
+                    color: subtitleColor,
                   ),
 
                   SizedBox(height: 20.h),
 
-                  // Password Field
-                  CustomText(
-                    text: "Email",
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
+                  // Email Field
+                  CustomText(text: "Email", fontSize: 14.sp, fontWeight: FontWeight.w500, color: textColor),
                   SizedBox(height: 6.h),
                   CustomTextField(
                     controller: _emailC,
@@ -120,6 +92,8 @@ class ForgetPasswordView extends StatelessWidget {
                     borderColor: Colors.grey,
                     hintText: "Enter your email",
                     showObscure: false,
+                    hintTextColo: subtitleColor,
+                    iconColor: textColor,
                   ),
 
                   SizedBox(height: 10.h),
@@ -137,20 +111,15 @@ class ForgetPasswordView extends StatelessWidget {
                               btnText: "Send Email",
                               onTap: () {
                                 if (_emailC.text.isEmpty) {
-                                  CustomToast.showToast(
-                                      "Please enter your valid email",
-                                      isError: true);
+                                  CustomToast.showToast("Please enter your valid email", isError: true);
                                 } else {
-                                  _forgetPasswordController.forgetPass(
-                                      email: _emailC.text);
+                                  _forgetPasswordController.forgetPass(email: _emailC.text);
                                 }
                               },
                               iconWant: false,
                             ),
                           );
                   }),
-
-                  // Next Button
 
                   SizedBox(height: 10.h),
 

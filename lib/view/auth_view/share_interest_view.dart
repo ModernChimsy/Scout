@@ -189,6 +189,7 @@ class _ShareInterestViewState extends State<ShareInterestView> {
                         return ChoiceChip(
                           label: Text(interest),
                           selected: isSelected,
+                          showCheckmark: false,
                           onSelected: (_) => _toggleSelection(interest),
                           selectedColor: AppColors.btnColor,
                           backgroundColor: AppColors.btnColor.withOpacity(0.1),
