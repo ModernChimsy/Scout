@@ -133,7 +133,7 @@ class _TagsViewState extends State<TagsView> {
                 borderColor: Colors.grey,
                 hintText: "Search here.....",
                 showObscure: false,
-                prefixIcon: Icons.search,
+                trailingIcon: Icons.search,
                 // onSubmitted: (_) => _saveTagsAndExit(), // TODO: add search logic here
               ),
               SizedBox(height: 20.h),

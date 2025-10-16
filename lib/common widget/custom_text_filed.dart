@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:restaurent_discount_app/uitilies/app_colors.dart';
 
 class CustomTextField extends StatefulWidget {
   final String hintText;
   final bool showObscure;
   final bool? readOnly;
-  final IconData? prefixIcon;
+  final IconData? trailingIcon;
   final String? image;
   final TextInputType? keyboardType;
   final TextEditingController? controller;
@@ -28,7 +29,7 @@ class CustomTextField extends StatefulWidget {
     required this.showObscure,
     this.keyboardType,
     this.controller,
-    this.prefixIcon,
+    this.trailingIcon,
     this.fillColor,
     this.borderColor,
     this.maxLines,
@@ -52,16 +53,35 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     Widget? customSuffixIcon;
+    Widget? finalSuffixIcon;
+    Widget? finalTrailingIcon;
 
     if (widget.showObscure) {
+      final String assetPath = _obscureText ? 'assets/icon/eye_closed.svg' : 'assets/icon/eye_open.svg';
+
       customSuffixIcon = IconButton(
-        icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
+        icon: SvgPicture.asset(assetPath, colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn), width: 24.w, height: 24.h),
         onPressed: () {
           setState(() {
             _obscureText = !_obscureText;
           });
         },
       );
+    }
+
+    if (widget.showObscure) {
+      finalSuffixIcon = customSuffixIcon;
+      finalTrailingIcon = null;
+    } else {
+      if (widget.trailingIcon != null) {
+        finalSuffixIcon = Icon(widget.trailingIcon, color: widget.iconColor ?? Colors.grey);
+      } else if (widget.image != null) {
+        finalSuffixIcon = Padding(
+          padding: EdgeInsets.all(10.sp),
+          child: Image.asset(widget.image!, width: 24.w, color: widget.iconColor, height: 24.h),
+        );
+      }
+      finalTrailingIcon = null;
     }
 
     return Container(
@@ -91,15 +111,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
             borderRadius: BorderRadius.circular(8.sp),
             borderSide: BorderSide(color: widget.borderColor ?? AppColors.mainColor, width: 1),
           ),
-          prefixIcon: (widget.prefixIcon != null && !widget.showObscure)
-              ? Icon(widget.prefixIcon, color: widget.iconColor ?? Colors.grey)
-              : (widget.image != null && !widget.showObscure)
-              ? Padding(
-                  padding: EdgeInsets.all(10.sp),
-                  child: Image.asset(widget.image!, width: 24.w, color: widget.iconColor, height: 24.h),
-                )
-              : null,
-          suffixIcon: customSuffixIcon,
+          prefixIcon: finalTrailingIcon,
+          suffixIcon: finalSuffixIcon,
           hintText: widget.hintText,
           hintStyle: GoogleFonts.poppins(fontSize: 14.h, color: widget.hintTextColo ?? Colors.grey),
         ),

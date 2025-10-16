@@ -69,7 +69,7 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
               SizedBox(height: 10),
               CustomTextField(
                 controller: _searchC,
-                prefixIcon: Icons.search,
+                trailingIcon: Icons.search,
                 fillColor: Colors.transparent,
                 borderColor: Colors.grey,
                 hintText: "Search for friends or events",

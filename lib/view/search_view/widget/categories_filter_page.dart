@@ -150,7 +150,7 @@ class _CategoriesFilterPageState extends State<CategoriesFilterPage> {
 
               CustomTextField(
                 controller: _searchController,
-                prefixIcon: Icons.search,
+                trailingIcon: Icons.search,
                 fillColor: isDarkMode ? Color(0xFF222222) : Colors.grey.shade100,
                 borderColor: Colors.transparent,
                 hintText: "Search",

@@ -102,7 +102,7 @@ class _InviteUserViewState extends State<InviteUserView> {
               borderColor: Colors.grey,
               hintText: "Search here...",
               showObscure: false,
-              prefixIcon: Icons.search,
+              trailingIcon: Icons.search,
               controller: searchController,
               onChanged: _filterUserList,
             ),
