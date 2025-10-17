@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_location_search/flutter_location_search.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -25,9 +26,8 @@ import 'package:restaurent_discount_app/view/create_event/extra_view.dart';
 import 'package:restaurent_discount_app/view/create_event/tags_view.dart';
 import 'package:restaurent_discount_app/view/create_event/tickets_view.dart';
 import 'package:restaurent_discount_app/view/create_event/widget/event_card_widget.dart';
-
-import '../../uitilies/api/local_storage.dart';
-import '../../uitilies/custom_toast.dart';
+import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
+import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
 
 class CreateEventView extends StatefulWidget {
   const CreateEventView({super.key});
@@ -43,7 +43,6 @@ class _CreateEventViewState extends State<CreateEventView> {
   final TextEditingController _endDateController = TextEditingController();
   final TextEditingController _startTimeController = TextEditingController();
   final TextEditingController _endTimeController = TextEditingController();
-
   final TextEditingController _eventNameC = TextEditingController();
   final TextEditingController _descriptionC = TextEditingController();
 
@@ -122,9 +121,25 @@ class _CreateEventViewState extends State<CreateEventView> {
   Widget build(BuildContext context) {
     final bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
+    final systemOverlayStyle = SystemUiOverlayStyle(
+      statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
+      statusBarBrightness: isDarkMode ? Brightness.dark : Brightness.light,
+    );
+
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.black : Colors.white,
-      appBar: CustomAppBar(title: "Event Information"),
+
+      appBar: AppBar(
+        systemOverlayStyle: systemOverlayStyle,
+        forceMaterialTransparency: true,
+        automaticallyImplyLeading: false,
+        title: CustomText(text: 'Event Information', color: isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
+        centerTitle: false,
+        titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        toolbarHeight: 50,
+        backgroundColor: Colors.transparent,
+      ),
+
       body: Padding(
         padding: AppPadding.bodyPadding,
         child: SingleChildScrollView(
@@ -380,20 +395,20 @@ class _CreateEventViewState extends State<CreateEventView> {
                         bgColor: AppColors.btnColor,
                         btnText: "Create Event",
                         onTap: () {
-                          final _storageService = Get.find<StorageService>();
+                          final storageService = Get.find<StorageService>();
 
-                          final bool isOwnAlcoholAllowed = _storageService.read<bool>('ownAlcohol') ?? false;
-                          final bool isCoatCheckRequired = _storageService.read<bool>('coatCheck') ?? false;
-                          final bool eventPrivate = _storageService.read<bool>('eventPrivate') ?? false;
-                          final bool isAgeRestricted = _storageService.read<bool>('isAgeRestricted') ?? false;
+                          final bool isOwnAlcoholAllowed = storageService.read<bool>('ownAlcohol') ?? false;
+                          final bool isCoatCheckRequired = storageService.read<bool>('coatCheck') ?? false;
+                          final bool eventPrivate = storageService.read<bool>('eventPrivate') ?? false;
+                          final bool isAgeRestricted = storageService.read<bool>('isAgeRestricted') ?? false;
 
-                          final String savedAge = _storageService.read<String>('minAgeRestriction') ?? "18";
-                          final String ticketLink = _storageService.read<String>('ticketSite') ?? "https://scoutevents.co.za/";
-                          final String? tagsStr = _storageService.read<String>('selectedTags');
+                          final String savedAge = storageService.read<String>('minAgeRestriction') ?? "18";
+                          final String ticketLink = storageService.read<String>('ticketSite') ?? "https://scoutevents.co.za/";
+                          final String? tagsStr = storageService.read<String>('selectedTags');
 
                           final List<String> tags = tagsStr != null && tagsStr.isNotEmpty ? tagsStr.split(',').map((e) => e.trim()).toList() : [];
-                          final List<String> ignoredUsers = _storageService.read<List<String>>('hiddenUserIds') ?? [];
-                          final List<String> inviteUser = _storageService.read<List<String>>('inviteUserId') ?? [];
+                          final List<String> ignoredUsers = storageService.read<List<String>>('hiddenUserIds') ?? [];
+                          final List<String> inviteUser = storageService.read<List<String>>('inviteUserId') ?? [];
 
                           final String title = _eventNameC.text.trim();
                           final String content = _descriptionC.text.trim();
@@ -402,7 +417,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                           final String startTime = _startTimeController.text.trim();
                           final String endTime = _endTimeController.text.trim();
 
-                          final dynamic rawActivities = _storageService.read('eventActivities');
+                          final dynamic rawActivities = storageService.read('eventActivities');
                           final List<Map<String, String>> activities = (rawActivities != null)
                               ? List<Map<String, String>>.from(rawActivities.map((e) => Map<String, String>.from(e as Map)))
                               : [];

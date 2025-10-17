@@ -163,21 +163,19 @@ class _ShareInterestViewState extends State<ShareInterestView> {
                 SizedBox(height: 20.h),
 
                 // Search
-                Text(
-                  "Search",
-                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: textColor),
-                ),
                 SizedBox(height: 6.h),
+
                 CustomTextField(
                   controller: _searchController,
                   fillColor: Colors.transparent,
                   borderColor: Colors.grey,
-                  hintText: "Search here.....",
+                  hintText: "Search",
                   showObscure: false,
-                  prefixIcon: Icons.search,
+                  trailingIcon: Icons.search,
                   hintTextColo: subtitleColor,
                   iconColor: textColor,
                 ),
+
                 SizedBox(height: 20.h),
 
                 // Chips
@@ -191,6 +189,7 @@ class _ShareInterestViewState extends State<ShareInterestView> {
                         return ChoiceChip(
                           label: Text(interest),
                           selected: isSelected,
+                          showCheckmark: false,
                           onSelected: (_) => _toggleSelection(interest),
                           selectedColor: AppColors.btnColor,
                           backgroundColor: AppColors.btnColor.withOpacity(0.1),

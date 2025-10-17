@@ -97,7 +97,7 @@ class _MyInterestViewState extends State<MyInterestView> {
                 borderColor: Colors.grey,
                 hintText: "Search here.....",
                 showObscure: false,
-                prefixIcon: Icons.search,
+                trailingIcon: Icons.search,
               ),
 
               SizedBox(height: 20.h),

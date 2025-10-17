@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_button_widget.dart';
 import 'package:restaurent_discount_app/uitilies/app_colors.dart';
@@ -15,17 +16,22 @@ import 'package:restaurent_discount_app/view/create_event/controller/theme_contr
 class OTPConfirmationView extends StatelessWidget {
   final bool redirectFromView;
   final String email;
+
   OTPConfirmationView({super.key, required this.redirectFromView, required this.email});
 
   final TextEditingController otpFormC = TextEditingController();
 
   final OTPController _otpController = Get.put(OTPController());
 
+  static const String orangeLogoPath = "assets/icon/scout_logo_orange.svg";
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
-          ThemeController.darkTheme;
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
+
+      Color textColor = isDarkMode ? Colors.white : Colors.black;
+      Color subtitleColor = isDarkMode ? Colors.white70 : Colors.black54;
 
       return Scaffold(
         body: Stack(
@@ -38,10 +44,7 @@ class OTPConfirmationView extends StatelessWidget {
                       : LinearGradient(
                           begin: Alignment.topRight,
                           end: Alignment.bottomLeft,
-                          colors: [
-                            Color(0xFFFB6012).withOpacity(0.1),
-                            Color(0xFFFFA07A).withOpacity(0.1),
-                          ],
+                          colors: [AppColors.btnColor.withOpacity(0.1), Color(0xFFFFA07A).withOpacity(0.1)],
                         ),
                   color: isDarkMode ? AppColors.bgColor : Colors.transparent,
                 ),
@@ -49,20 +52,7 @@ class OTPConfirmationView extends StatelessWidget {
             ),
 
             Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: isDarkMode
-                      ? null
-                      : LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            Colors.white.withOpacity(0.5),
-                            Colors.white,
-                          ],
-                        ),
-                ),
-              ),
+              child: Container(decoration: BoxDecoration(gradient: isDarkMode ? null : AppColors.gradient)),
             ),
 
             // Foreground UI
@@ -75,30 +65,22 @@ class OTPConfirmationView extends StatelessWidget {
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Image(image: AssetImage("assets/images/long_logo.png")),
-                    ],
+                    children: [SvgPicture.asset(orangeLogoPath, height: 20.h)],
                   ),
 
                   SizedBox(height: 30.h),
 
                   // Welcome Text
-                  CustomText(
-                    text: "Check your email",
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
+                  CustomText(text: "Check your email", fontSize: 20.sp, fontWeight: FontWeight.bold, color: textColor),
 
                   SizedBox(height: 5.h),
 
                   // Subtitle
                   CustomText(
                     textAlign: TextAlign.start,
-                    text:
-                        "We’ve sent a otp $email to reset your password.",
+                    text: "We’ve sent a otp to $email to reset your password.",
                     fontSize: 14.sp,
-                    color: isDarkMode ? Colors.white : Colors.black54,
+                    color: subtitleColor,
                   ),
 
                   SizedBox(height: 20.h),
@@ -109,17 +91,8 @@ class OTPConfirmationView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CustomText(
-                        text: "Didn’t receive OTP",
-                        fontSize: 16,
-                        color: isDarkMode ? Colors.white : Colors.black,
-                      ),
-                      CustomText(
-                        text: "Resend Code",
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      CustomText(text: "Didn’t receive OTP", fontSize: 16, color: textColor),
+                      CustomText(text: "Resend Code", color: AppColors.btnColor, fontSize: 16, fontWeight: FontWeight.bold),
                     ],
                   ),
 
@@ -137,13 +110,10 @@ class OTPConfirmationView extends StatelessWidget {
                               bgColor: AppColors.btnColor,
                               btnText: "Submit",
                               onTap: () {
-                                if (otpFormC.text.isEmpty) {
-                                  CustomToast.showToast("OTP input required",
-                                      isError: true);
+                                if (otpFormC.text.isEmpty || otpFormC.text.length < 6) {
+                                  CustomToast.showToast("Please enter the complete OTP", isError: true);
                                 } else {
-                                  _otpController.otpSubmit(
-                                      otp: otpFormC.text,
-                                      redirect: redirectFromView);
+                                  _otpController.otpSubmit(otp: otpFormC.text, redirect: redirectFromView);
                                 }
                               },
                               iconWant: false,

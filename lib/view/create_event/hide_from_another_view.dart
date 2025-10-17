@@ -137,7 +137,7 @@ class _HideEventPageState extends State<HideEventPage> {
               borderColor: Colors.grey,
               hintText: "Search here...",
               showObscure: false,
-              prefixIcon: Icons.search,
+              trailingIcon: Icons.search,
               onChanged: _filterUserList,
               onSubmitted: (_) => _saveAndExit(),
             ),

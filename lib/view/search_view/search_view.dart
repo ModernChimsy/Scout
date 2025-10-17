@@ -1,14 +1,14 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_text_filed.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/view/search_view/controller/filter_controller.dart';
 import 'package:restaurent_discount_app/view/search_view/controller/location_filter_controller.dart';
 import 'package:restaurent_discount_app/view/search_view/search_details_page.dart';
-
-import '../../common widget/custom text/custom_text_widget.dart';
+import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 
 class EventCategoryScreen extends StatefulWidget {
   @override
@@ -20,10 +20,7 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
     Category("Music", "https://ciac.uiu.ac.bd/wp-content/uploads/2018/08/austin-neill-247047-unsplash.jpg"),
     Category("Sport", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQujYgGA83X-bf70YeHs5PPzJCP107naLymbg&s"),
     Category("Festivals", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbB14Z-rV5i2EHhz61PgqLVl4a0_BJhTcArg&s"),
-    Category(
-      "Art & Theatre",
-      "https://upload.wikimedia.org/wikipedia/commons/5/5d/Labudovo_jezero%2C_Balet_SNP-a%2C_Jelena_Le%C4%8Di%C4%87%2C_Andrej_Kol%C4%8Deriju%2C_foto_M._Polzovi%C4%87.jpg",
-    ),
+    Category("Art & Theatre", "https://upload.wikimedia.org/wikipedia/commons/5/5d/Labudovo_jezero%2C_Balet_SNP-a%2C_Jelena_Le%C4%8Di%C4%87%2C_Andrej_Kol%C4%8Deriju%2C_foto_M._Polzovi%C4%87.jpg"),
     Category("Nightlife", "https://ciac.uiu.ac.bd/wp-content/uploads/2018/08/austin-neill-247047-unsplash.jpg"),
     Category("Food & Drink", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_4y-42Isg1bbcN-2wfhw2YwpNMSgkJkWSXg&s"),
   ];
@@ -53,9 +50,16 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
   Widget build(BuildContext context) {
     return Obx(() {
       bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
+
+      final systemOverlayStyle = SystemUiOverlayStyle(
+        statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDarkMode ? Brightness.dark : Brightness.light,
+      );
+
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
         appBar: AppBar(
+          systemOverlayStyle: systemOverlayStyle,
           forceMaterialTransparency: true,
           automaticallyImplyLeading: false,
           title: CustomText(text: 'Search', color: isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
@@ -69,7 +73,7 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
               SizedBox(height: 10),
               CustomTextField(
                 controller: _searchC,
-                prefixIcon: Icons.search,
+                trailingIcon: Icons.search,
                 fillColor: Colors.transparent,
                 borderColor: Colors.grey,
                 hintText: "Search for friends or events",

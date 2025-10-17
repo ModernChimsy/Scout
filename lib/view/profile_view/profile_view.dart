@@ -3,6 +3,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
@@ -18,9 +19,9 @@ import 'package:restaurent_discount_app/view/profile_view/controller/get_my_inte
 import 'package:restaurent_discount_app/view/profile_view/controller/profile_get_controller.dart';
 import 'package:restaurent_discount_app/view/profile_view/settings_view/account_settings_view.dart';
 import 'package:restaurent_discount_app/view/profile_view/widget/profile_shimmer_widget.dart';
-import '../../uitilies/custom_loader.dart';
-import '../event_details/event_details_view.dart';
-import '../public_profile/widget/stats_box_widget.dart';
+import 'package:restaurent_discount_app/uitilies/custom_loader.dart';
+import 'package:restaurent_discount_app/view/event_details/event_details_view.dart';
+import 'package:restaurent_discount_app/view/public_profile/widget/stats_box_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -34,7 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
   final ProfileGetController _profileGetController = Get.put(ProfileGetController());
   final EventDeleteController _eventDeleteController = Get.put(EventDeleteController());
-  final MyInterstedController _myInterstedController = Get.put(MyInterstedController());
+  final MyInterstedController _myInterestedController = Get.put(MyInterstedController());
   final GetMyEventController _getMyEventController = Get.put(GetMyEventController());
 
   void _handleTabChange() {
@@ -42,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
     switch (_tabController.index) {
       case 0:
-        _myInterstedController.getInterestedEvent();
+        _myInterestedController.getInterestedEvent();
         break;
       case 1:
         _getMyEventController.getMyEvent();
@@ -60,7 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     _tabController.addListener(_handleTabChange);
 
     _profileGetController.getProfile();
-    _myInterstedController.getInterestedEvent();
+    _myInterestedController.getInterestedEvent();
     _getMyEventController.getMyEvent();
   }
 
@@ -75,9 +76,16 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     return Obx(() {
       bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
+      final systemOverlayStyle = SystemUiOverlayStyle(
+        statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDarkMode ? Brightness.dark : Brightness.light,
+      );
+
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
+
         appBar: AppBar(
+          systemOverlayStyle: systemOverlayStyle,
           forceMaterialTransparency: true,
           automaticallyImplyLeading: false,
           title: CustomText(text: 'Profile', color: isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
@@ -95,6 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           toolbarHeight: 50,
           backgroundColor: Colors.transparent,
         ),
+
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: SingleChildScrollView(
@@ -167,7 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                                       children: [
                                         StatBox(title: 'Follower', value: _profileGetController.profile.value.data?.followerCount?.toString() ?? "0"),
                                         StatBox(title: 'Following', value: _profileGetController.profile.value.data?.followCount?.toString() ?? "0"),
-                                        StatBox(title: 'Event', value: _profileGetController.profile.value.data?.events?.length.toString() ?? "0"),
+                                        StatBox(title: 'Event', value: _profileGetController.profile.value.data?.events.length.toString() ?? "0"),
                                       ],
                                     );
                                   }
@@ -212,7 +221,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 SizedBox(height: 20),
                 SizedBox(
                   height: max(
-                    (_myInterstedController.nurseData.value.data?.length ?? 0) * 600,
+                    (_myInterestedController.nurseData.value.data?.length ?? 0) * 600,
                     (_getMyEventController.nurseData.value.data?.length ?? 0) * 600,
                   ),
                   child: TabBarView(
@@ -220,11 +229,11 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     controller: _tabController,
                     children: [
                       Obx(() {
-                        if (_myInterstedController.isLoading.value) {
+                        if (_myInterestedController.isLoading.value) {
                           return const Center(child: CircularProgressIndicator());
                         }
 
-                        final eventList = _myInterstedController.nurseData.value.data ?? [];
+                        final eventList = _myInterestedController.nurseData.value.data ?? [];
 
                         if (eventList.isEmpty) {
                           return NotFoundWidget(message: "No Create Event found");
@@ -240,19 +249,14 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
                             final interestedPeopleImages =
                                 event?.interestEvents
-                                    .map(
-                                      (interestEvent) =>
-                                          interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
-                                    )
+                                    .map((interestEvent) => interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png')
                                     .toList() ??
                                 [];
 
                             return EventCard(
                               onDeleteTap: () {},
                               eventId: interestData.id,
-                              image: (event?.image != null && event!.image!.isNotEmpty)
-                                  ? event.image!
-                                  : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
+                              image: (event?.image != null && event!.image!.isNotEmpty) ? event.image! : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
                               eventName: event?.title ?? '',
                               eventDate: event?.date?.toLocal().toString().split(' ')[0] ?? '',
                               categories: event?.tags ?? [],
@@ -283,26 +287,19 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                             final event = eventList[index];
                             final eventDetails = event;
 
-                            final interestedPeopleImages =
-                                eventDetails.interestEvents
-                                    .map(
-                                      (interestEvent) =>
-                                          interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
-                                    )
-                                    .toList() ??
-                                [];
+                            final interestedPeopleImages = eventDetails.interestEvents
+                                .map((interestEvent) => interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png')
+                                .toList();
 
                             return EventCard(
                               onDeleteTap: () {},
                               eventId: event.id,
-                              image: (event.image != null && event.image!.isNotEmpty)
-                                  ? event.image.toString()
-                                  : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
+                              image: (event.image != null && event.image!.isNotEmpty) ? event.image.toString() : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
                               eventName: eventDetails.title ?? '',
                               eventDate: eventDetails.date?.toLocal().toString().split(' ')[0] ?? '',
-                              categories: eventDetails.tags ?? [],
+                              categories: eventDetails.tags,
                               eventDescription: eventDetails.content ?? '',
-                              friendsInterested: eventDetails.interestEvents.length ?? 0,
+                              friendsInterested: eventDetails.interestEvents.length,
                               onTap: () => Get.to(() => EventDetailPage(eventId: event.id!)),
                               interestedPeopleImage: interestedPeopleImages,
                             );
@@ -328,25 +325,18 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                           itemBuilder: (context, index) {
                             final event = privateEvents[index];
 
-                            final interestedPeopleImages =
-                                event.interestEvents
-                                    .map(
-                                      (interestEvent) =>
-                                          interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
-                                    )
-                                    .toList() ??
-                                [];
+                            final interestedPeopleImages = event.interestEvents
+                                .map((interestEvent) => interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',)
+                                .toList();
 
                             return EventCard(
                               eventId: event.id,
-                              image: (event.image != null && event.image!.isNotEmpty)
-                                  ? event.image.toString()
-                                  : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
+                              image: (event.image != null && event.image!.isNotEmpty) ? event.image.toString() : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
                               eventName: event.title ?? '',
                               eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
-                              categories: event.tags ?? [],
+                              categories: event.tags,
                               eventDescription: event.content ?? '',
-                              friendsInterested: event.interestEvents.length ?? 0,
+                              friendsInterested: event.interestEvents.length,
                               onTap: () => Get.to(() => EventDetailPage(eventId: event.id!)),
                               interestedPeopleImage: interestedPeopleImages,
                             );
