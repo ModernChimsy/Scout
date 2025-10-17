@@ -1,10 +1,12 @@
 // ignore_for_file: prefer_const_constructors, unused_local_variable
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/uitilies/app_colors.dart';
+import 'package:restaurent_discount_app/common widget/no_data_found_widget.dart';
 import 'package:restaurent_discount_app/uitilies/custom_loader.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/view/event_details/event_details_view.dart';
@@ -15,7 +17,6 @@ import 'package:restaurent_discount_app/view/notification_view/notification_view
 import 'package:restaurent_discount_app/view/profile_view/controller/profile_get_controller.dart';
 import 'package:restaurent_discount_app/view/home_view/controller/all_event_controller.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../common widget/no_data_found_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -35,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<String> tabs = ['For You', 'Friends', 'Today'];
 
   int _currentIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -65,9 +67,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Obx(() {
       bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
+      final systemOverlayStyle = SystemUiOverlayStyle(
+        statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDarkMode ? Brightness.dark : Brightness.light,
+      );
+
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
         appBar: AppBar(
+          systemOverlayStyle: systemOverlayStyle,
           forceMaterialTransparency: true,
           automaticallyImplyLeading: false,
           title: Obx(() {
@@ -152,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Expanded(
               child: Obx(() {
-                // Tab - For You
+                /// Tab - For You
                 if (_currentIndex == 0) {
                   final eventList = _allEventController.eventList;
 
@@ -180,20 +188,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         final event = eventList[index];
 
                         final interestedPeopleImages = (event.interestEvents)
-                            .map(
-                              (interestEvent) =>
-                                  (interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'),
-                            )
+                            .map((interestEvent) => (interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'))
                             .toList();
-
-                        log.d("🧩 eventId: ${event.id}");
-                        log.d("🧩 image: ${event.image}");
 
                         return EventCard(
                           eventId: event.id,
-                          image: (event.image != null && event.image!.isNotEmpty)
-                              ? event.image.toString()
-                              : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
+                          image: (event.image != null && event.image!.isNotEmpty) ? event.image.toString() : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
                           eventName: event.title ?? '',
                           eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
                           categories: event.tags,
@@ -207,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }
 
-                // Tab - Friends
+                /// Tab - Friends
                 if (_currentIndex == 1) {
                   final eventList = _friendsEventController.eventList;
 
@@ -235,13 +235,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         final event = eventList[index];
 
                         final interestedPeopleImages = (event.interestEvents)
-                            .map(
-                              (interestEvent) =>
-                                  (interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'),
-                            )
+                            .map((interestEvent) => (interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'))
                             .toList();
-
-                        log.d("🧩 eventId: ${event.id},  image: ${event.image}");
 
                         return EventCard(
                           eventId: event.id,
@@ -259,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }
 
-                // Tab - Today
+                /// Tab - Today
                 if (_currentIndex == 2) {
                   final eventList = _todayEventController.eventList;
 
@@ -292,9 +287,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   (interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'),
                             )
                             .toList();
-
-                        log.d("🧩 eventId: ${event.id}");
-                        log.d("🧩 image: ${event.image}");
 
                         return EventCard(
                           eventId: event.id,

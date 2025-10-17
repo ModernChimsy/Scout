@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
@@ -17,7 +18,7 @@ import 'package:restaurent_discount_app/view/search_view/controller/location_fil
 import 'package:restaurent_discount_app/view/search_view/widget/date_range_widget.dart';
 import 'package:restaurent_discount_app/view/search_view/widget/location_page.dart';
 import 'package:restaurent_discount_app/view/search_view/widget/categories_filter_page.dart';
-import '../../common widget/custom text/custom_text_widget.dart';
+import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 
 class SearchDetailsPage extends StatefulWidget {
   final String? tag;
@@ -57,17 +58,20 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
     return name.replaceAll(RegExp(r'[^a-zA-Z0-9\s]'), ' ').trim().toLowerCase();
   }
 
+  String _capitalizeWords(String input) {
+    if (input.isEmpty) return input;
+    return input.split(' ').map((word) => word.capitalizeFirst).join(' ');
+  }
+
   String getPageTitle() {
     if (widget.searchQuery != null && widget.searchQuery!.isNotEmpty) {
+      /// Priority 1: Search Query Results
       return 'Results for "${widget.searchQuery!.capitalizeFirst}"';
-    } else if (selectedCategories.isNotEmpty) {
-      String capitalizedCategories = selectedCategories
-          .map((category) => category.split(' ').map((word) => word.capitalizeFirst).join(' '))
-          .join(', ');
-
-      if (selectedCategories.length == 1 && capitalizedCategories.isNotEmpty) {
-        return capitalizedCategories;
-      }
+    } else if (initialTagDisplay != null && selectedCategories.length <= 1) {
+      /// Priority 2: Initial Single Category (e.g., "Music")
+      return _capitalizeWords(initialTagDisplay!);
+    } else if (selectedCategories.length > 1) {
+      /// Priority 3: Multiple Categories Selected (e.g., "Category Events")
       return 'Category Events';
     }
     return 'Event Filter';
@@ -96,7 +100,8 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
     if (selectedCategories.isEmpty) {
       return 'Category';
     } else if (selectedCategories.length == 1) {
-      return selectedCategories.first.split(' ').map((word) => word.capitalizeFirst).join(' ') ?? 'Category';
+      String displayCategory = _capitalizeWords(selectedCategories.first);
+      return displayCategory.isNotEmpty ? displayCategory : 'Category';
     } else {
       return 'Category (${selectedCategories.length})';
     }
@@ -113,33 +118,30 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      String appBarTitle = 'Search';
+      String appBarTitle = getPageTitle();
       bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
       String categoryButtonTitle = getCategoryButtonTitle();
 
-      bool useSimpleSearchAppBar = widget.searchQuery == null || widget.searchQuery!.isEmpty;
+      final systemOverlayStyle = SystemUiOverlayStyle(
+        statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDarkMode ? Brightness.dark : Brightness.light,
+      );
 
-      PreferredSizeWidget appBarWidget;
+      PreferredSizeWidget appBarWidget = AppBar(
+        systemOverlayStyle: systemOverlayStyle,
+        forceMaterialTransparency: true,
+        automaticallyImplyLeading: false,
 
-      if (useSimpleSearchAppBar) {
-        if (widget.tag != null && widget.tag!.isNotEmpty) {
-          appBarTitle = widget.tag!.capitalizeFirst ?? widget.tag!;
-        }
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: isDarkMode ? Colors.white : Colors.black, size: 20),
+          onPressed: () => Get.back(),
+        ),
 
-        appBarWidget = AppBar(
-          forceMaterialTransparency: true,
-          automaticallyImplyLeading: false,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: isDarkMode ? Colors.white : Colors.black, size: 20),
-            onPressed: () => Get.back(),
-          ),
-          title: CustomText(text: appBarTitle, color: isDarkMode ? Colors.white : Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
-          centerTitle: false,
-          backgroundColor: Colors.transparent,
-        );
-      } else {
-        appBarWidget = CustomAppBar(title: getPageTitle());
-      }
+        title: CustomText(text: appBarTitle, color: isDarkMode ? Colors.white : Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+      );
 
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
@@ -147,6 +149,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
         body: Padding(
           padding: AppPadding.bodyPadding,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: 20),
               SingleChildScrollView(
@@ -195,10 +198,11 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                             return Container(
                               height: MediaQuery.of(context).size.height * 0.9,
                               child: CategoriesFilterPage(
-                                initialSelectedCategories: selectedCategories,
+                                initialSelectedCategories: selectedCategories.map((c) => _capitalizeWords(c)).toSet(),
                                 onCategoriesSelected: (newCategories) {
                                   setState(() {
                                     selectedCategories = newCategories.map((c) => _prepareCategoryForApi(c)).toSet();
+                                    initialTagDisplay = selectedCategories.length == 1 ? newCategories.first : null;
                                   });
                                   _applyFilter(newTags: selectedCategories.join(','));
                                 },
@@ -246,17 +250,12 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                             final event = _filterController.filterResults.value.data![index];
 
                             final interestedPeopleImages = event.interestEvents
-                                .map(
-                                  (interestEvent) =>
-                                      interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',
-                                )
+                                .map((interestEvent) => interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png')
                                 .toList();
 
                             return EventCard(
                               eventId: event.id,
-                              image: event.image?.isNotEmpty == true
-                                  ? event.image.toString()
-                                  : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
+                              image: event.image?.isNotEmpty == true ? event.image.toString() : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
                               eventName: event.title ?? '',
                               eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
                               categories: event.tags,
