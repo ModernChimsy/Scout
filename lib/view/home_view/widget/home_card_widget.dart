@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,6 +16,8 @@ import 'package:restaurent_discount_app/uitilies/data/hive_data/hive_model_class
 import 'package:restaurent_discount_app/view/home_view/controller/event_interested_controller.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:restaurent_discount_app/uitilies/date_formatter.dart';
+import 'package:restaurent_discount_app/common_widget/chips/category_chip_widget.dart';
+import 'package:restaurent_discount_app/common_widget/chips/category_more_chip_widget.dart';
 
 class EventCard extends StatefulWidget {
   final String eventName;
@@ -56,6 +58,8 @@ class _EventCardState extends State<EventCard> {
 
   bool _isLoading = true;
   bool _isBookmarked = false;
+  bool _showAllCategories = false;
+  static const int _maxVisibleCategories = 2;
 
   final EventDeleteController _eventDeleteController = Get.put(EventDeleteController());
   final InterestedPostController _interestedPostController = Get.put(InterestedPostController());
@@ -66,7 +70,9 @@ class _EventCardState extends State<EventCard> {
     super.initState();
     _checkIfBookmarked();
     Future.delayed(Duration(seconds: 2), () {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     });
   }
 
@@ -85,9 +91,11 @@ class _EventCardState extends State<EventCard> {
         interestedPeopleImage: [],
       ),
     );
-    setState(() {
-      _isBookmarked = event.eventId.isNotEmpty;
-    });
+    if (mounted) {
+      setState(() {
+        _isBookmarked = event.eventId.isNotEmpty;
+      });
+    }
   }
 
   void _toggleBookmark() async {
@@ -125,14 +133,27 @@ class _EventCardState extends State<EventCard> {
       if (!alreadyExists) await box.add(event);
     }
 
-    setState(() {
-      _isBookmarked = !_isBookmarked;
-    });
+    if (mounted) {
+      setState(() {
+        _isBookmarked = !_isBookmarked;
+      });
+    }
+  }
+
+  List<String> get _displayCategories {
+    if (_showAllCategories || widget.categories.length <= _maxVisibleCategories) {
+      return widget.categories;
+    }
+    return widget.categories.sublist(0, _maxVisibleCategories);
+  }
+
+  int get _remainingCategoriesCount {
+    return widget.categories.length - _maxVisibleCategories;
   }
 
   @override
   Widget build(BuildContext context) {
-    log.d("🧩 Event Date: ${widget.eventDate}"); // TODO: log the timestamp here and go futher to customise the timestamp here
+    log.d("🧩 Event Date: ${widget.eventDate}");
 
     return Obx(() {
       bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
@@ -189,13 +210,21 @@ class _EventCardState extends State<EventCard> {
                         : Wrap(
                             spacing: 8,
                             runSpacing: 6,
-                            children: widget.categories.map((category) {
-                              return Container(
-                                decoration: BoxDecoration(color: categoryColor(category), borderRadius: BorderRadius.circular(5)),
-                                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                child: CustomText(text: category, fontSize: 13, fontWeight: FontWeight.w500),
-                              );
-                            }).toList(),
+                            children: [
+                              ..._displayCategories.map((category) {
+                                return CategoryChipWidget(category: category, isDarkMode: isDarkMode);
+                              }),
+                              if (!_showAllCategories && _remainingCategoriesCount > 0)
+                                CategoryMoreChipWidget(
+                                  remainingCount: _remainingCategoriesCount,
+                                  isDarkMode: isDarkMode,
+                                  onTap: () {
+                                    setState(() {
+                                      _showAllCategories = true;
+                                    });
+                                  },
+                                ),
+                            ],
                           ),
 
                     SizedBox(height: Constant.eventCardSpacer), // Spacing after categories
@@ -288,19 +317,6 @@ class _EventCardState extends State<EventCard> {
         ),
       );
     });
-  }
-
-  Color categoryColor(String category) {
-    switch (category.toLowerCase()) {
-      case 'nightlife':
-        return Color(0xFFd2dcff);
-      case 'music':
-        return Color(0xFFfedfd0);
-      case 'food':
-        return Color(0xFFe0ffe0);
-      default:
-        return Color(0xFFfcefe8);
-    }
   }
 
   Widget shimmerBlock({required double width, required double height}) {
