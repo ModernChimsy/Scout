@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:logger/logger.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_button_widget.dart';
 import 'package:restaurent_discount_app/uitilies/constant.dart';
@@ -14,6 +15,7 @@ import 'package:restaurent_discount_app/view/profile_view/controller/event_delet
 import 'package:restaurent_discount_app/uitilies/data/hive_data/hive_model_class_dart.dart';
 import 'package:restaurent_discount_app/view/home_view/controller/event_interested_controller.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:restaurent_discount_app/uitilies/date_formatter.dart';
 
 class EventCard extends StatefulWidget {
   final String eventName;
@@ -50,6 +52,8 @@ class EventCard extends StatefulWidget {
 }
 
 class _EventCardState extends State<EventCard> {
+  static final log = Logger();
+
   bool _isLoading = true;
   bool _isBookmarked = false;
 
@@ -128,6 +132,8 @@ class _EventCardState extends State<EventCard> {
 
   @override
   Widget build(BuildContext context) {
+    log.d("🧩 Event Date: ${widget.eventDate}"); // TODO: log the timestamp here and go futher to customise the timestamp here
+
     return Obx(() {
       bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
@@ -142,7 +148,6 @@ class _EventCardState extends State<EventCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: Constant.eventCardSpacer), // Spacing from top of card
-              
               /// Image Section
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: Constant.eventCardSpacer),
@@ -168,14 +173,13 @@ class _EventCardState extends State<EventCard> {
               ),
 
               SizedBox(height: Constant.eventCardSpacer), // Spacing after image
-
               /// Text Content Section
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: Constant.eventCardSpacer),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Categories
+                    /// Categories
                     _isLoading
                         ? Shimmer.fromColors(
                             baseColor: Colors.grey.shade300,
@@ -193,21 +197,20 @@ class _EventCardState extends State<EventCard> {
                               );
                             }).toList(),
                           ),
-                    
-                    SizedBox(height: Constant.eventCardSpacer), // Spacing after categories
 
-                    // Date
+                    SizedBox(height: Constant.eventCardSpacer), // Spacing after categories
+                    /// Date
+                    /// This now uses the DateFormatter utility class // TODO: Update timestamp
                     _isLoading
                         ? shimmerBlock(width: 100, height: 16)
                         : CustomText(
-                            text: widget.eventDate,
+                            text: DateFormatter.formatEventDate(widget.eventDate),
                             fontSize: 14,
                             color: isDarkMode ? Colors.white.withOpacity(0.7) : Colors.black.withOpacity(0.7),
                           ),
-                    
-                    SizedBox(height: Constant.eventCardSpacer), // Spacing after date
 
-                    // Event Name
+                    SizedBox(height: Constant.eventCardSpacer), // Spacing after date
+                    /// Event Name
                     _isLoading
                         ? shimmerBlock(width: 200, height: 20)
                         : CustomText(
@@ -216,8 +219,8 @@ class _EventCardState extends State<EventCard> {
                             fontWeight: FontWeight.bold,
                             color: isDarkMode ? Colors.white : Colors.black,
                           ),
-                    
-                    SizedBox(height: Constant.eventCardSpacer),  // Spacing after event name
+
+                    SizedBox(height: Constant.eventCardSpacer), // Spacing after event name
                     // Friends Interested Row
                     _isLoading
                         ? shimmerBlock(width: 100, height: 20)
@@ -226,7 +229,7 @@ class _EventCardState extends State<EventCard> {
                             friendsImages: widget.interestedPeopleImage,
                             color: isDarkMode ? Colors.white : Colors.black,
                           ),
-                    
+
                     SizedBox(height: Constant.eventCardSpacer), // Spacing before buttons
                     // Buttons/Bookmark
                     _isLoading
@@ -275,7 +278,7 @@ class _EventCardState extends State<EventCard> {
                               ],
                             ],
                           ),
-                    
+
                     SizedBox(height: Constant.eventCardSpacer), // Spacing at the bottom of the card
                   ],
                 ),
