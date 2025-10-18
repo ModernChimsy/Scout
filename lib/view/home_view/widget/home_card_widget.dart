@@ -10,10 +10,9 @@ import 'package:restaurent_discount_app/view/create_event/controller/theme_contr
 import 'package:restaurent_discount_app/view/home_view/controller/all_event_controller.dart';
 import 'package:restaurent_discount_app/view/home_view/widget/friends_widget.dart';
 import 'package:restaurent_discount_app/view/profile_view/controller/event_delete_controller.dart';
+import 'package:restaurent_discount_app/uitilies/data/hive_data/hive_model_class_dart.dart';
+import 'package:restaurent_discount_app/view/home_view/controller/event_interested_controller.dart';
 import 'package:shimmer/shimmer.dart';
-
-import '../../../uitilies/data/hive_data/hive_model_class_dart.dart';
-import '../controller/event_interested_controller.dart';
 
 class EventCard extends StatefulWidget {
   final String eventName;
@@ -156,7 +155,7 @@ class _EventCardState extends State<EventCard> {
                       height: 330,
                       decoration: BoxDecoration(
                         image: DecorationImage(image: NetworkImage(widget.image), fit: BoxFit.fill),
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(4), bottom: Radius.circular(4)),
                       ),
                     ),
               Padding(
