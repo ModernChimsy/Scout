@@ -127,6 +127,11 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: List.generate(tabs.length, (index) {
+                  final Color activeColor = isDarkMode ? AppColors.tabActiveColorDark : AppColors.tabActiveColorLight;
+                  final Color inactiveColor = isDarkMode ? AppColors.tabInActiveColorDark : AppColors.tabInActiveColorLight;
+                  final Color backgroundColor = _currentIndex == index ? activeColor : inactiveColor;
+                  final Color textColor = _currentIndex == index ? Colors.white : (isDarkMode ? Colors.white : Colors.black);
+
                   return GestureDetector(
                     onTap: () {
                       setState(() {
@@ -144,14 +149,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 7, horizontal: 30),
                       decoration: BoxDecoration(
-                        color: _currentIndex == index ? AppColors.btnColor : Color(0xFFFFF5F0),
+                        color: backgroundColor,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: CustomText(
                         text: tabs[index],
                         fontSize: 15,
                         fontWeight: _currentIndex == index ? FontWeight.bold : FontWeight.normal,
-                        color: _currentIndex == index ? Colors.white : Colors.black,
+                        color: textColor,
                       ),
                     ),
                   );
