@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_button_widget.dart';
+import 'package:restaurent_discount_app/uitilies/constant.dart';
 import 'package:restaurent_discount_app/uitilies/custom_loader.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/view/home_view/controller/all_event_controller.dart';
@@ -135,34 +136,46 @@ class _EventCardState extends State<EventCard> {
         child: Card(
           elevation: 0.1,
           color: isDarkMode ? Colors.black : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          margin: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _isLoading
-                  ? Shimmer.fromColors(
-                      baseColor: Colors.grey.shade300,
-                      highlightColor: Colors.grey.shade100,
-                      child: Container(
+              SizedBox(height: Constant.eventCardSpacer), // Spacing from top of card
+              
+              /// Image Section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Constant.eventCardSpacer),
+                child: _isLoading
+                    ? Shimmer.fromColors(
+                        baseColor: Colors.grey.shade300,
+                        highlightColor: Colors.grey.shade100,
+                        child: Container(
+                          height: 330,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(4), bottom: Radius.circular(4)),
+                          ),
+                        ),
+                      )
+                    : Container(
                         height: 330,
                         decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                          image: DecorationImage(image: NetworkImage(widget.image), fit: BoxFit.fill),
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(4), bottom: Radius.circular(4)),
                         ),
                       ),
-                    )
-                  : Container(
-                      height: 330,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(image: NetworkImage(widget.image), fit: BoxFit.fill),
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(4), bottom: Radius.circular(4)),
-                      ),
-                    ),
+              ),
+
+              SizedBox(height: Constant.eventCardSpacer), // Spacing after image
+
+              /// Text Content Section
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.symmetric(horizontal: Constant.eventCardSpacer),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Categories
                     _isLoading
                         ? Shimmer.fromColors(
                             baseColor: Colors.grey.shade300,
@@ -180,7 +193,10 @@ class _EventCardState extends State<EventCard> {
                               );
                             }).toList(),
                           ),
-                    SizedBox(height: 10),
+                    
+                    SizedBox(height: Constant.eventCardSpacer), // Spacing after categories
+
+                    // Date
                     _isLoading
                         ? shimmerBlock(width: 100, height: 16)
                         : CustomText(
@@ -188,7 +204,10 @@ class _EventCardState extends State<EventCard> {
                             fontSize: 14,
                             color: isDarkMode ? Colors.white.withOpacity(0.7) : Colors.black.withOpacity(0.7),
                           ),
-                    SizedBox(height: 8),
+                    
+                    SizedBox(height: Constant.eventCardSpacer), // Spacing after date
+
+                    // Event Name
                     _isLoading
                         ? shimmerBlock(width: 200, height: 20)
                         : CustomText(
@@ -197,7 +216,9 @@ class _EventCardState extends State<EventCard> {
                             fontWeight: FontWeight.bold,
                             color: isDarkMode ? Colors.white : Colors.black,
                           ),
-                    SizedBox(height: 10),
+                    
+                    SizedBox(height: Constant.eventCardSpacer),  // Spacing after event name
+                    // Friends Interested Row
                     _isLoading
                         ? shimmerBlock(width: 100, height: 20)
                         : FriendsInterestedRow(
@@ -205,7 +226,9 @@ class _EventCardState extends State<EventCard> {
                             friendsImages: widget.interestedPeopleImage,
                             color: isDarkMode ? Colors.white : Colors.black,
                           ),
-                    SizedBox(height: 16),
+                    
+                    SizedBox(height: Constant.eventCardSpacer), // Spacing before buttons
+                    // Buttons/Bookmark
                     _isLoading
                         ? shimmerBlock(width: 120, height: 38)
                         : Row(
@@ -252,6 +275,8 @@ class _EventCardState extends State<EventCard> {
                               ],
                             ],
                           ),
+                    
+                    SizedBox(height: Constant.eventCardSpacer), // Spacing at the bottom of the card
                   ],
                 ),
               ),

@@ -11,6 +11,8 @@ class AppColors {
   static Color tabInActiveColorDark = const Color(0x804B5155);
   static Color btnColor = const Color(0xFFFB6012);
   static Color btnBorderColor = const Color(0xFF050505);
+  static Color cardBackgroundLight = const Color(0xFFF4F4F4);
+  static Color cardBackgroundDark = const Color(0xFF25282A);
 
   static Color get bgColor {
     if (Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme) {

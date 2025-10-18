@@ -148,10 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 7, horizontal: 30),
-                      decoration: BoxDecoration(
-                        color: backgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                      decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(20)),
                       child: CustomText(
                         text: tabs[index],
                         fontSize: 15,
@@ -185,9 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemCount: eventList.length + (_allEventController.hasMore.value ? 1 : 0),
                       itemBuilder: (_, index) {
                         if (index == eventList.length) {
-                          return Center(
-                            child: Padding(padding: const EdgeInsets.all(12.0), child: CustomLoader()),
-                          );
+                          return Center(child: Padding(padding: const EdgeInsets.all(12.0), child: CustomLoader()));
                         }
 
                         final event = eventList[index];
@@ -196,16 +191,19 @@ class _HomeScreenState extends State<HomeScreen> {
                             .map((interestEvent) => (interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'))
                             .toList();
 
-                        return EventCard(
-                          eventId: event.id,
-                          image: (event.image != null && event.image!.isNotEmpty) ? event.image.toString() : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
-                          eventName: event.title ?? '',
-                          eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
-                          categories: event.tags,
-                          eventDescription: event.content ?? '',
-                          friendsInterested: event.interestEvents.length,
-                          onTap: () => Get.to(() => EventDetailPage(eventId: event.id!)),
-                          interestedPeopleImage: interestedPeopleImages,
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
+                          child: EventCard(
+                            eventId: event.id,
+                            image: (event.image != null && event.image!.isNotEmpty) ? event.image.toString() : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
+                            eventName: event.title ?? '',
+                            eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
+                            categories: event.tags,
+                            eventDescription: event.content ?? '',
+                            friendsInterested: event.interestEvents.length,
+                            onTap: () => Get.to(() => EventDetailPage(eventId: event.id!)),
+                            interestedPeopleImage: interestedPeopleImages,
+                          ),
                         );
                       },
                     ),
@@ -232,9 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemCount: eventList.length + (_friendsEventController.hasMore.value ? 1 : 0),
                       itemBuilder: (_, index) {
                         if (index == eventList.length) {
-                          return Center(
-                            child: Padding(padding: const EdgeInsets.all(12.0), child: CustomLoader()),
-                          );
+                          return Center(child: Padding(padding: const EdgeInsets.all(12.0), child: CustomLoader()));
                         }
 
                         final event = eventList[index];
@@ -243,16 +239,19 @@ class _HomeScreenState extends State<HomeScreen> {
                             .map((interestEvent) => (interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'))
                             .toList();
 
-                        return EventCard(
-                          eventId: event.id,
-                          image: event.image.toString(),
-                          eventName: event.title ?? '',
-                          eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
-                          categories: event.tags,
-                          eventDescription: event.content ?? '',
-                          friendsInterested: event.interestEvents.length,
-                          onTap: () => Get.to(() => EventDetailPage(eventId: event.id!)),
-                          interestedPeopleImage: interestedPeopleImages,
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
+                          child: EventCard(
+                            eventId: event.id,
+                            image: event.image.toString(),
+                            eventName: event.title ?? '',
+                            eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
+                            categories: event.tags,
+                            eventDescription: event.content ?? '',
+                            friendsInterested: event.interestEvents.length,
+                            onTap: () => Get.to(() => EventDetailPage(eventId: event.id!)),
+                            interestedPeopleImage: interestedPeopleImages,
+                          ),
                         );
                       },
                     ),
@@ -279,30 +278,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemCount: eventList.length + (_todayEventController.hasMore.value ? 1 : 0),
                       itemBuilder: (_, index) {
                         if (index == eventList.length) {
-                          return Center(
-                            child: Padding(padding: const EdgeInsets.all(12.0), child: CustomLoader()),
-                          );
+                          return Center(child: Padding(padding: const EdgeInsets.all(12.0), child: CustomLoader()));
                         }
 
                         final event = eventList[index];
 
                         final interestedPeopleImages = (event.interestEvents)
-                            .map(
-                              (interestEvent) =>
-                                  (interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'),
-                            )
+                            .map((interestEvent) => (interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'))
                             .toList();
 
-                        return EventCard(
-                          eventId: event.id,
-                          image: event.image.toString(),
-                          eventName: event.title ?? '',
-                          eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
-                          categories: event.tags,
-                          eventDescription: event.content ?? '',
-                          friendsInterested: event.interestEvents.length,
-                          onTap: () => Get.to(() => EventDetailPage(eventId: event.id!)),
-                          interestedPeopleImage: interestedPeopleImages,
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
+                          child: EventCard(
+                            eventId: event.id,
+                            image: event.image.toString(),
+                            eventName: event.title ?? '',
+                            eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
+                            categories: event.tags,
+                            eventDescription: event.content ?? '',
+                            friendsInterested: event.interestEvents.length,
+                            onTap: () => Get.to(() => EventDetailPage(eventId: event.id!)),
+                            interestedPeopleImage: interestedPeopleImages,
+                          ),
                         );
                       },
                     ),
