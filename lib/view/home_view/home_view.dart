@@ -130,7 +130,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   final Color activeColor = isDarkMode ? AppColors.tabActiveColorDark : AppColors.tabActiveColorLight;
                   final Color inactiveColor = isDarkMode ? AppColors.tabInActiveColorDark : AppColors.tabInActiveColorLight;
                   final Color backgroundColor = _currentIndex == index ? activeColor : inactiveColor;
-                  final Color textColor = _currentIndex == index ? Colors.white : (isDarkMode ? Colors.white : Colors.black);
+
+                  final Color textColor;
+                  if (_currentIndex == index) {
+                    textColor = isDarkMode ? Colors.black : Colors.white;
+                  } else {
+                    textColor = isDarkMode ? Colors.white : Colors.black;
+                  }
 
                   return GestureDetector(
                     onTap: () {
