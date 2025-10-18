@@ -9,6 +9,7 @@ final List<Map<String, String>> foodItems = [
 
 class Constant {
   static const int perPage = 10;
+  static const double eventCardSpacer = 10.0;
 }
 
 class EmailValidator {

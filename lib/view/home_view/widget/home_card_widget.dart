@@ -1,19 +1,23 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:logger/logger.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_button_widget.dart';
+import 'package:restaurent_discount_app/uitilies/constant.dart';
 import 'package:restaurent_discount_app/uitilies/custom_loader.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/view/home_view/controller/all_event_controller.dart';
 import 'package:restaurent_discount_app/view/home_view/widget/friends_widget.dart';
 import 'package:restaurent_discount_app/view/profile_view/controller/event_delete_controller.dart';
+import 'package:restaurent_discount_app/uitilies/data/hive_data/hive_model_class_dart.dart';
+import 'package:restaurent_discount_app/view/home_view/controller/event_interested_controller.dart';
 import 'package:shimmer/shimmer.dart';
-
-import '../../../uitilies/data/hive_data/hive_model_class_dart.dart';
-import '../controller/event_interested_controller.dart';
+import 'package:restaurent_discount_app/uitilies/date_formatter.dart';
+import 'package:restaurent_discount_app/common_widget/chips/category_chip_widget.dart';
+import 'package:restaurent_discount_app/common_widget/chips/category_more_chip_widget.dart';
 
 class EventCard extends StatefulWidget {
   final String eventName;
@@ -50,8 +54,12 @@ class EventCard extends StatefulWidget {
 }
 
 class _EventCardState extends State<EventCard> {
+  static final log = Logger();
+
   bool _isLoading = true;
   bool _isBookmarked = false;
+  bool _showAllCategories = false;
+  static const int _maxVisibleCategories = 2;
 
   final EventDeleteController _eventDeleteController = Get.put(EventDeleteController());
   final InterestedPostController _interestedPostController = Get.put(InterestedPostController());
@@ -62,7 +70,9 @@ class _EventCardState extends State<EventCard> {
     super.initState();
     _checkIfBookmarked();
     Future.delayed(Duration(seconds: 2), () {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     });
   }
 
@@ -81,9 +91,11 @@ class _EventCardState extends State<EventCard> {
         interestedPeopleImage: [],
       ),
     );
-    setState(() {
-      _isBookmarked = event.eventId.isNotEmpty;
-    });
+    if (mounted) {
+      setState(() {
+        _isBookmarked = event.eventId.isNotEmpty;
+      });
+    }
   }
 
   void _toggleBookmark() async {
@@ -121,13 +133,28 @@ class _EventCardState extends State<EventCard> {
       if (!alreadyExists) await box.add(event);
     }
 
-    setState(() {
-      _isBookmarked = !_isBookmarked;
-    });
+    if (mounted) {
+      setState(() {
+        _isBookmarked = !_isBookmarked;
+      });
+    }
+  }
+
+  List<String> get _displayCategories {
+    if (_showAllCategories || widget.categories.length <= _maxVisibleCategories) {
+      return widget.categories;
+    }
+    return widget.categories.sublist(0, _maxVisibleCategories);
+  }
+
+  int get _remainingCategoriesCount {
+    return widget.categories.length - _maxVisibleCategories;
   }
 
   @override
   Widget build(BuildContext context) {
+    log.d("🧩 Event Date: ${widget.eventDate}");
+
     return Obx(() {
       bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
@@ -136,34 +163,44 @@ class _EventCardState extends State<EventCard> {
         child: Card(
           elevation: 0.1,
           color: isDarkMode ? Colors.black : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          margin: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _isLoading
-                  ? Shimmer.fromColors(
-                      baseColor: Colors.grey.shade300,
-                      highlightColor: Colors.grey.shade100,
-                      child: Container(
+              SizedBox(height: Constant.eventCardSpacer), // Spacing from top of card
+              /// Image Section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Constant.eventCardSpacer),
+                child: _isLoading
+                    ? Shimmer.fromColors(
+                        baseColor: Colors.grey.shade300,
+                        highlightColor: Colors.grey.shade100,
+                        child: Container(
+                          height: 330,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(4), bottom: Radius.circular(4)),
+                          ),
+                        ),
+                      )
+                    : Container(
                         height: 330,
                         decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                          image: DecorationImage(image: NetworkImage(widget.image), fit: BoxFit.fill),
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(4), bottom: Radius.circular(4)),
                         ),
                       ),
-                    )
-                  : Container(
-                      height: 330,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(image: NetworkImage(widget.image), fit: BoxFit.fill),
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                      ),
-                    ),
+              ),
+
+              SizedBox(height: Constant.eventCardSpacer), // Spacing after image
+              /// Text Content Section
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.symmetric(horizontal: Constant.eventCardSpacer),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    /// Categories
                     _isLoading
                         ? Shimmer.fromColors(
                             baseColor: Colors.grey.shade300,
@@ -173,23 +210,36 @@ class _EventCardState extends State<EventCard> {
                         : Wrap(
                             spacing: 8,
                             runSpacing: 6,
-                            children: widget.categories.map((category) {
-                              return Container(
-                                decoration: BoxDecoration(color: categoryColor(category), borderRadius: BorderRadius.circular(5)),
-                                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                child: CustomText(text: category, fontSize: 13, fontWeight: FontWeight.w500),
-                              );
-                            }).toList(),
+                            children: [
+                              ..._displayCategories.map((category) {
+                                return CategoryChipWidget(category: category, isDarkMode: isDarkMode);
+                              }),
+                              if (!_showAllCategories && _remainingCategoriesCount > 0)
+                                CategoryMoreChipWidget(
+                                  remainingCount: _remainingCategoriesCount,
+                                  isDarkMode: isDarkMode,
+                                  onTap: () {
+                                    setState(() {
+                                      _showAllCategories = true;
+                                    });
+                                  },
+                                ),
+                            ],
                           ),
-                    SizedBox(height: 10),
+
+                    SizedBox(height: Constant.eventCardSpacer), // Spacing after categories
+                    /// Date
+                    /// This now uses the DateFormatter utility class // TODO: Update timestamp
                     _isLoading
                         ? shimmerBlock(width: 100, height: 16)
                         : CustomText(
-                            text: widget.eventDate,
+                            text: DateFormatter.formatEventDate(widget.eventDate),
                             fontSize: 14,
                             color: isDarkMode ? Colors.white.withOpacity(0.7) : Colors.black.withOpacity(0.7),
                           ),
-                    SizedBox(height: 8),
+
+                    SizedBox(height: Constant.eventCardSpacer), // Spacing after date
+                    /// Event Name
                     _isLoading
                         ? shimmerBlock(width: 200, height: 20)
                         : CustomText(
@@ -198,7 +248,9 @@ class _EventCardState extends State<EventCard> {
                             fontWeight: FontWeight.bold,
                             color: isDarkMode ? Colors.white : Colors.black,
                           ),
-                    SizedBox(height: 10),
+
+                    SizedBox(height: Constant.eventCardSpacer), // Spacing after event name
+                    // Friends Interested Row
                     _isLoading
                         ? shimmerBlock(width: 100, height: 20)
                         : FriendsInterestedRow(
@@ -206,7 +258,9 @@ class _EventCardState extends State<EventCard> {
                             friendsImages: widget.interestedPeopleImage,
                             color: isDarkMode ? Colors.white : Colors.black,
                           ),
-                    SizedBox(height: 16),
+
+                    SizedBox(height: Constant.eventCardSpacer), // Spacing before buttons
+                    // Buttons/Bookmark
                     _isLoading
                         ? shimmerBlock(width: 120, height: 38)
                         : Row(
@@ -253,6 +307,8 @@ class _EventCardState extends State<EventCard> {
                               ],
                             ],
                           ),
+
+                    SizedBox(height: Constant.eventCardSpacer), // Spacing at the bottom of the card
                   ],
                 ),
               ),
@@ -261,19 +317,6 @@ class _EventCardState extends State<EventCard> {
         ),
       );
     });
-  }
-
-  Color categoryColor(String category) {
-    switch (category.toLowerCase()) {
-      case 'nightlife':
-        return Color(0xFFd2dcff);
-      case 'music':
-        return Color(0xFFfedfd0);
-      case 'food':
-        return Color(0xFFe0ffe0);
-      default:
-        return Color(0xFFfcefe8);
-    }
   }
 
   Widget shimmerBlock({required double width, required double height}) {
