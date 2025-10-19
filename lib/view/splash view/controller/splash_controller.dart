@@ -2,34 +2,35 @@
 
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
+import 'package:restaurent_discount_app/auth/token_manager.dart';
 import 'package:restaurent_discount_app/view/bottom_navigation_bar_view/bottom_navigation_bar_view.dart';
 import 'package:restaurent_discount_app/view/splash%20view/welcome_view.dart';
 
 class SplashController extends GetxController {
   Timer? timer;
   var opacity = 0.0.obs;
-  final StorageService _storageService = Get.put(StorageService());
+
+  final TokenManager _tokenManager = TokenManager();
 
   @override
   void onInit() {
     super.onInit();
 
-    timer = Timer.periodic(Duration(seconds: 3), (Timer t) {
-      if (opacity.value != 1.0) {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      if (opacity.value < 1.0) {
         opacity.value += 0.5;
+      } else {
+        t.cancel();
       }
     });
 
-    // After 3 seconds, check for accessToken and navigate
     Future.delayed(const Duration(seconds: 3), () async {
-      String? accessToken = _storageService.read<String>('accessToken');
+      String? accessToken = await _tokenManager.getAccessToken();
 
       if (accessToken != null && accessToken.isNotEmpty) {
-        Get.to(() => BottomNavBarExample());
+        Get.offAll(() => BottomNavBarExample());
       } else {
-        // If no accessToken exists, navigate to Welcome View
-        Get.to(() => WelcomeView());
+        Get.offAll(() => const WelcomeView());
       }
     });
   }

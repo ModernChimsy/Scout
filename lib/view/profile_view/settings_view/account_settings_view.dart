@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_app_bar_widget.dart';
 import 'package:restaurent_discount_app/uitilies/constant.dart';
-import 'package:restaurent_discount_app/view/auth_view/sign_in_view.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/view/profile_view/controller/profile_get_controller.dart';
 import 'package:restaurent_discount_app/view/profile_view/settings_view/account_privacy_view.dart';
@@ -17,20 +16,20 @@ import 'package:restaurent_discount_app/view/profile_view/settings_view/theme_vi
 import 'package:restaurent_discount_app/view/profile_view/settings_view/update_password_view.dart';
 import 'package:restaurent_discount_app/view/profile_view/widget/account_settings_top_section_widget.dart';
 import 'package:restaurent_discount_app/view/profile_view/widget/settings_card_widget.dart';
-
-import '../../../uitilies/api/local_storage.dart';
+import '../../../auth/auth_manager.dart';
 import '../widget/shimmer_profile_widget.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
-  AccountSettingsScreen({super.key});
+  const AccountSettingsScreen({super.key});
 
   @override
   _AccountSettingsScreenState createState() => _AccountSettingsScreenState();
 }
 
 class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
-  final ProfileGetController _profileGetController =
-      Get.put(ProfileGetController());
+  final ProfileGetController _profileGetController = Get.put(ProfileGetController());
+
+  final AuthManager _authManager = AuthManager();
   late bool isDarkMode;
 
   @override
@@ -43,8 +42,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
-          ThemeController.darkTheme;
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
       return Scaffold(
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
         appBar: CustomAppBar(title: "Account Settings"),
@@ -55,15 +53,9 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
               SizedBox(height: 20),
 
               Obx(() {
-                String name =
-                    _profileGetController.profile.value.data?.firstName ??
-                        'User';
-                String profileImage =
-                    _profileGetController.profile.value.data?.profilePicture ??
-                        '';
-                String username =
-                    _profileGetController.profile.value.data?.lastName ??
-                        '@username';
+                String name = _profileGetController.profile.value.data?.firstName ?? 'User';
+                String profileImage = _profileGetController.profile.value.data?.profilePicture ?? '';
+                String username = _profileGetController.profile.value.data?.lastName ?? '@username';
 
                 return _profileGetController.isLoading.value == true
                     ? ShimmerProfileWidget()
@@ -71,7 +63,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         name: name,
                         color: isDarkMode ? Colors.white : Colors.black,
                         profileImage: profileImage.isEmpty
-                            ? 'https://t4.ftcdn.net/jpg/07/03/86/11/360_F_703861114_7YxIPnoH8NfmbyEffOziaXy0EO1NpRHD.jpg' // Default image
+                            ? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png' // Default image
                             : profileImage,
                         username: username,
                       );
@@ -187,11 +179,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                 bgColor: isDarkMode ? Color(0xFF4B515580) : Color(0xFFF4F4F4),
                 title: 'Sign Out',
                 onTap: () async {
-                  final StorageService storageService =
-                      Get.put(StorageService());
-                  await storageService.remove('accessToken');
-
-                  Get.offAll(() => SignInView());
+                  await _authManager.signOut();
                 },
                 image: 'assets/images/Vector (1).png',
                 iconColor: isDarkMode ? Colors.white : Colors.black,

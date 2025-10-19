@@ -1,92 +1,68 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
-import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
+import 'package:restaurent_discount_app/auth/token_manager.dart';
 
 class BaseClient {
+  static final log = Logger();
   static var noInternetMessage = "Please check your connection!";
 
-  static getRequest({required String api, params}) async {
-    debugPrint("\nYou hit: $api");
-    debugPrint("Request Params: $params");
+  static final TokenManager _tokenManager = TokenManager();
 
-    /// get x storage
-    final StorageService _storageService = Get.put(StorageService());
-    String? accessToken = _storageService.read<String>('accessToken');
+  static Future<http.Response> getRequest({required String api, Map<String, dynamic>? params}) async {
+    final String? accessToken = await _tokenManager.getAccessToken();
+    final Map<String, String> headers = {'Content-type': 'application/json', "Authorization": "Bearer $accessToken"};
+    final Uri uri = Uri.parse(api).replace(queryParameters: params?.map((key, value) => MapEntry(key, value.toString())));
 
-    var headers = {
-      'Content-type': 'application/json',
-      "Authorization": "Bearer $accessToken"
-    };
-    debugPrint("statusCode: id: ");
+    log.i("➡️ GET: $api");
+    log.d({"url": uri.toString(), "headers": headers, "token_present": accessToken != null && accessToken.isNotEmpty});
 
-    http.Response response = await http.get(
-      Uri.parse(api).replace(queryParameters: params),
-      headers: headers,
-    );
+    final http.Response response = await http.get(uri, headers: headers);
+    log.i("⬅️ GET Response | Status: ${response.statusCode}");
+
     return response;
   }
 
-  static postRequest({required String api, body}) async {
-    debugPrint('\nYou hit: $api');
-    debugPrint('Request Body: ${jsonEncode(body)}');
+  static Future<http.Response> postRequest({required String api, dynamic body}) async {
+    final String? accessToken = await _tokenManager.getAccessToken();
+    final Map<String, String> headers = {'Accept': 'application/json', "Authorization": "Bearer $accessToken"};
+    final String bodyString = body is String ? body : jsonEncode(body);
 
-    /// getx storage
-    final StorageService _storageService = Get.put(StorageService());
-    String? accessToken = _storageService.read<String>('accessToken');
+    log.i("➡️ POST: $api");
+    log.d({"url": api, "headers": headers, "body": bodyString, "token_present": accessToken != null && accessToken.isNotEmpty});
 
-    var headers = {
-      'Accept': 'application/json',
-      "Authorization": "Bearer $accessToken"
-    };
+    final http.Response response = await http.post(Uri.parse(api), body: bodyString, headers: headers, encoding: Encoding.getByName("utf-8"));
+    log.i("⬅️ POST Response | Status: ${response.statusCode}");
 
-    http.Response response = await http.post(Uri.parse(api),
-        body: body, headers: headers, encoding: Encoding.getByName("utf-8"));
     return response;
   }
 
-  static deleteRequest({required String api, body}) async {
-    debugPrint('\nYou hit: $api');
-    debugPrint('Request Body: ${jsonEncode(body)}');
+  static Future<http.Response> deleteRequest({required String api, dynamic body}) async {
+    final String? accessToken = await _tokenManager.getAccessToken();
+    final Map<String, String> headers = {'Accept': 'application/json', "Authorization": "Bearer $accessToken"};
+    final String? bodyString = body != null ? (body is String ? body : jsonEncode(body)) : null;
 
-    /// getx storage
-    final StorageService _storageService = Get.put(StorageService());
-    String? accessToken = _storageService.read<String>('accessToken');
+    log.i("➡️ DELETE: $api");
+    log.d({"url": api, "headers": headers, "body": bodyString, "token_present": accessToken != null && accessToken.isNotEmpty});
 
-    var headers = {
-      'Accept': 'application/json',
-      "Authorization": "Bearer $accessToken"
-    };
+    final http.Response response = await http.delete(Uri.parse(api), body: bodyString, headers: headers);
+    log.i("⬅️ DELETE Response | Status: ${response.statusCode}");
 
-    http.Response response =
-    await http.delete(Uri.parse(api), body: body, headers: headers);
     return response;
   }
 
-  // Add PATCH method here
-  static patchRequest(
-      {required String api, required Map<String, dynamic> body}) async {
-    debugPrint('\nYou hit: $api');
-    debugPrint('Request Body: ${jsonEncode(body)}');
+  static Future<http.Response> patchRequest({required String api, required Map<String, dynamic> body}) async {
+    final String? accessToken = await _tokenManager.getAccessToken();
+    final Map<String, String> headers = {'Content-type': 'application/json', "Authorization": "Bearer $accessToken"};
+    final String bodyString = jsonEncode(body);
 
-    /// getx storage
-    final StorageService _storageService = Get.put(StorageService());
-    String? accessToken = _storageService.read<String>('accessToken');
-
-    var headers = {
-      'Content-type': 'application/json',
-      "Authorization": "Bearer $accessToken"
-    };
+    log.i("➡️ PATCH: $api");
+    log.d({"url": api, "headers": headers, "body": bodyString, "token_present": accessToken != null && accessToken.isNotEmpty});
 
     try {
-      http.Response response = await http.patch(
-        Uri.parse(api),
-        body: jsonEncode(body),
-        headers: headers,
-      );
+      final http.Response response = await http.patch(Uri.parse(api), body: bodyString, headers: headers);
+      log.i("⬅️ PATCH Response | Status: ${response.statusCode}");
       return response;
     } on SocketException {
       throw noInternetMessage;
@@ -95,40 +71,39 @@ class BaseClient {
     }
   }
 
-  static multipartAddRequest({
+  static Future<http.Response> multipartAddRequest({
     required String api,
     required Map<String, String> body,
     required String fileKeyName,
     required String filePath,
   }) async {
-    print("\nYou hit: $api");
-    print("Request body: $body");
+    final Map<String, String> headers = {'Accept': 'application/json', "id": ""};
 
-    var headers = {'Accept': 'application/json', "id": ""};
+    log.i("➡️ MULTIPART POST: $api");
+    log.d({"url": api, "headers": headers, "fields": body, "file_key": fileKeyName, "file_path": filePath.isEmpty ? 'N/A' : filePath});
 
-    http.MultipartRequest request;
-    if (filePath.isEmpty || filePath == '') {
-      request = http.MultipartRequest('POST', Uri.parse(api))
-        ..fields.addAll(body)
-        ..headers.addAll(headers);
-    } else {
-      request = http.MultipartRequest('POST', Uri.parse(api))
-        ..fields.addAll(body)
-        ..headers.addAll(headers)
-        ..files.add(await http.MultipartFile.fromPath(fileKeyName, filePath));
+    http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(api))
+      ..fields.addAll(body)
+      ..headers.addAll(headers);
+
+    if (filePath.isNotEmpty) {
+      request.files.add(await http.MultipartFile.fromPath(fileKeyName, filePath));
     }
 
-    var streamedResponse = await request.send();
-    var response = await http.Response.fromStream(streamedResponse);
+    final http.StreamedResponse streamedResponse = await request.send();
+    final http.Response response = await http.Response.fromStream(streamedResponse);
+
+    log.i("⬅️ MULTIPART Response | Status: ${response.statusCode}");
 
     return response;
   }
 
   static handleResponse(http.Response response) async {
+    log.i("ℹ️ Processing Response: Status ${response.statusCode}");
+
     try {
       if (response.statusCode >= 200 && response.statusCode <= 210) {
-        debugPrint('SuccessCode: ${response.statusCode}');
-        debugPrint('SuccessResponse: ${response.body}');
+        log.d('✅ Success Body: ${response.body}');
 
         if (response.body.isNotEmpty) {
           return json.decode(response.body);
@@ -136,21 +111,24 @@ class BaseClient {
           return response.body;
         }
       } else if (response.statusCode == 500) {
-        debugPrint("statusCode: 500");
+        log.e("❌ Server Error (500)");
         throw "Server Error";
       } else {
-        debugPrint('ErrorCode: ${response.statusCode}');
-        debugPrint('ErrorResponse: ${response.body}');
+        log.e('❌ API Error | Status: ${response.statusCode} | Body: ${response.body}');
 
         String msg = "Something went wrong";
         if (response.body.isNotEmpty) {
-          var data = jsonDecode(response.body)['errors'];
+          final decodedBody = jsonDecode(response.body);
+          var data = decodedBody['errors'];
+
           if (data == null) {
-            msg = jsonDecode(response.body)['message'] ?? msg;
+            msg = decodedBody['message'] ?? msg;
           } else if (data is String) {
             msg = data;
-          } else if (data is Map) {
+          } else if (data is Map && data.containsKey('email') && data['email'] is List && data['email'].isNotEmpty) {
             msg = data['email'][0];
+          } else if (decodedBody.containsKey('message')) {
+            msg = decodedBody['message'];
           }
         }
 

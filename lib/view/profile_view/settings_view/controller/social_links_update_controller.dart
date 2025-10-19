@@ -1,37 +1,27 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:convert';
-import 'dart:ui';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:restaurent_discount_app/auth/token_manager.dart';
 import 'package:restaurent_discount_app/uitilies/api/api_url.dart';
 import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
 import 'package:restaurent_discount_app/view/profile_view/settings_view/account_settings_view.dart';
-
-import '../../../../../uitilies/api/local_storage.dart';
-import 'dart:io';
 import '../../controller/profile_get_controller.dart';
 
 class UpdateSocialLinkController extends GetxController {
   var isLoading = false.obs;
 
-  final ProfileGetController profileController =
-      Get.put(ProfileGetController());
+  final ProfileGetController profileController = Get.put(ProfileGetController());
 
-  Future<void> updateSocial(
-    String instagram,
-    String tiktok,
-    String x,
-    String spotify,
-    String otherSocial,
-  ) async {
+  Future<void> updateSocial(String instagram, String tiktok, String x, String spotify, String otherSocial) async {
     try {
       isLoading(true);
 
       var uri = Uri.parse(ApiUrl.updateProfile);
-      final StorageService _storageService = StorageService();
 
-      String? accessToken = _storageService.read<String>('accessToken');
+      final TokenManager _tokenManager = TokenManager();
+      String? accessToken = await _tokenManager.getAccessToken();
 
       var request = http.MultipartRequest('PATCH', uri);
 
@@ -39,19 +29,12 @@ class UpdateSocialLinkController extends GetxController {
         request.headers['Authorization'] = 'Bearer $accessToken';
       }
 
-      request.fields.addAll({
-        "instagram": instagram,
-        "tiktok": tiktok,
-        "x": x,
-        "spotify": spotify,
-        "otherSocial": otherSocial,
-      });
+      request.fields.addAll({"instagram": instagram, "tiktok": tiktok, "x": x, "spotify": spotify, "otherSocial": otherSocial});
 
       print("Request headers: ${request.headers}");
       print("Request fields: ${request.fields}");
 
       var response = await request.send();
-
       String responseBody = await response.stream.bytesToString();
 
       print('Response status: ${response.statusCode}');
@@ -62,12 +45,10 @@ class UpdateSocialLinkController extends GetxController {
 
         if (responseJson['success'] == true) {
           CustomToast.showToast("Social Links update successful!");
-
           profileController.getProfile();
           Get.to(() => AccountSettingsScreen());
         } else {
-          String errorMessage =
-              responseJson['message'] ?? 'Update failed. Please try again.';
+          String errorMessage = responseJson['message'] ?? 'Update failed. Please try again.';
           CustomToast.showToast(errorMessage, isError: true);
         }
       } else {

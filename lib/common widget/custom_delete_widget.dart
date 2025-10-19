@@ -42,7 +42,7 @@ class CustomDeleteWidget {
                   SizedBox(height: 20),
                   CustomTextField(
                     controller: controller,
-                    prefixIcon: Icons.lock_outline,
+                    trailingIcon: Icons.lock_outline,
                     hintText: 'Password'.tr,
                     showObscure: true,
                   ),

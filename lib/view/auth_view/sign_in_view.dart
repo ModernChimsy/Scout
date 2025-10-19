@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_button_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_text_filed.dart';
@@ -25,12 +26,15 @@ class SignInView extends StatelessWidget {
   final TextEditingController emailC = TextEditingController();
   final TextEditingController passwordC = TextEditingController();
 
-  @override
+  static const String orangeLogoPath = "assets/icon/scout_logo_orange.svg";
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode = Get.find<ThemeController>().selectedTheme ==
-          ThemeController.darkTheme;
+      bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
+
+      Color textColor = isDarkMode ? Colors.white : Colors.black;
+      Color subtitleColor = isDarkMode ? Colors.white70 : Colors.black54;
 
       return Scaffold(
         body: LayoutBuilder(
@@ -50,32 +54,14 @@ class SignInView extends StatelessWidget {
                                 : LinearGradient(
                                     begin: Alignment.topRight,
                                     end: Alignment.bottomLeft,
-                                    colors: [
-                                      Color(0xFFFB6012).withOpacity(0.1),
-                                      Color(0xFFFFA07A).withOpacity(0.1),
-                                    ],
+                                    colors: [AppColors.scoutVividVermilion.withOpacity(0.1), Color(0xFFFFA07A).withOpacity(0.1)],
                                   ),
-                            color: isDarkMode
-                                ? AppColors.bgColor
-                                : Colors.transparent,
+                            color: isDarkMode ? AppColors.bgColor : Colors.transparent,
                           ),
                         ),
                       ),
                       Positioned.fill(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: isDarkMode
-                                ? null
-                                : LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Colors.white.withOpacity(0.5),
-                                      Colors.white,
-                                    ],
-                                  ),
-                          ),
-                        ),
+                        child: Container(decoration: BoxDecoration(gradient: isDarkMode ? null : AppColors.gradient)),
                       ),
 
                       // Main content
@@ -87,31 +73,19 @@ class SignInView extends StatelessWidget {
                             SizedBox(height: 80.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Image(
-                                    image: AssetImage(
-                                        "assets/images/long_logo.png")),
-                              ],
+                              children: [SvgPicture.asset(orangeLogoPath, height: 20.h)],
                             ),
                             SizedBox(height: 30.h),
-                            CustomText(
-                              text: "Welcome back",
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.bold,
-                              color: isDarkMode ? Colors.white : Colors.black,
-                            ),
+                            CustomText(text: "Welcome back", fontSize: 20.sp, fontWeight: FontWeight.bold, color: textColor),
                             SizedBox(height: 5.h),
-                            CustomText(
-                              text: "Create your login details below",
-                              fontSize: 14.sp,
-                              color:
-                                  isDarkMode ? Colors.white54 : Colors.black54,
-                            ),
+                            CustomText(text: "Create your login details below", fontSize: 14.sp, color: subtitleColor),
                             SizedBox(height: 20.h),
                             CustomText(
-                                text: "Email",
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w500),
+                              color: textColor,
+                              text: "Email",
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
                             SizedBox(height: 6.h),
                             CustomTextField(
                               controller: emailC,
@@ -119,14 +93,11 @@ class SignInView extends StatelessWidget {
                               borderColor: Colors.grey,
                               hintText: "Enter your email",
                               showObscure: false,
+                              hintTextColo: subtitleColor,
+                              iconColor: textColor,
                             ),
                             SizedBox(height: 10.h),
-                            CustomText(
-                              color: isDarkMode ? Colors.white : Colors.black,
-                              text: "Password",
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            CustomText(color: textColor, text: "Password", fontSize: 14.sp, fontWeight: FontWeight.w500),
                             SizedBox(height: 6.h),
                             CustomTextField(
                               controller: passwordC,
@@ -134,26 +105,28 @@ class SignInView extends StatelessWidget {
                               borderColor: Colors.grey,
                               hintText: "Enter your password",
                               showObscure: true,
+                              hintTextColo: subtitleColor,
+                              iconColor: textColor,
                             ),
                             SizedBox(height: 10.h),
                             Align(
-                                alignment: Alignment.topRight,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Get.to(() => ForgetPasswordView());
-                                  },
-                                  child: Text(
-                                    "Forgot password ?",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14.sp,
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.grey,
-                                      decoration: TextDecoration.underline,
-                                    ),
+                              alignment: Alignment.topRight,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Get.to(() => ForgetPasswordView());
+                                },
+                                child: Text(
+                                  "Forgot password ?",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14.sp,
+                                    color: isDarkMode ? Colors.white : Colors.grey,
+                                    decoration: TextDecoration.underline,
                                   ),
-                                )),
+                                ),
+                              ),
+                            ),
                             SizedBox(height: 30.h),
+                            Spacer(),
                             Obx(() {
                               return _signInController.isLoading.value
                                   ? CustomLoader()
@@ -164,15 +137,10 @@ class SignInView extends StatelessWidget {
                                         bgColor: AppColors.btnColor,
                                         btnText: "Sign in",
                                         onTap: () {
-                                          if (emailC.text.isEmpty ||
-                                              passwordC.text.isEmpty) {
-                                            return CustomToast.showToast(
-                                                "All fields are required",
-                                                isError: true);
+                                          if (emailC.text.isEmpty || passwordC.text.isEmpty) {
+                                            return CustomToast.showToast("All fields are required", isError: true);
                                           } else {
-                                            _signInController.login(
-                                                email: emailC.text,
-                                                password: passwordC.text);
+                                            _signInController.login(email: emailC.text, password: passwordC.text);
                                           }
                                         },
                                         iconWant: false,
@@ -184,32 +152,19 @@ class SignInView extends StatelessWidget {
                               child: RichText(
                                 text: TextSpan(
                                   text: "New here? ",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14.sp,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
+                                  style: GoogleFonts.poppins(fontSize: 14.sp, color: textColor),
                                   children: [
                                     TextSpan(
                                       text: "Create an Account",
                                       style: TextStyle(
                                         fontSize: 14.sp,
-                                        color: isDarkMode
-                                            ? Colors.orangeAccent
-                                            : Colors.orange,
+                                        color: AppColors.btnColor,
                                         fontWeight: FontWeight.bold,
                                         decoration: TextDecoration.underline,
                                       ),
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CreateAccountView(),
-                                            ),
-                                          );
+                                          Get.to(() => CreateAccountView());
                                         },
                                     ),
                                   ],
