@@ -143,26 +143,10 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                                   italic: FontStyle.italic,
                                   text: (_profileGetController.profile.value.data?.bio?.isNotEmpty ?? false)
                                       ? _profileGetController.profile.value.data!.bio!
-                                      : "Bio not available",
+                                      : "",
                                   fontSize: 15,
-                                  color: isDarkMode ? Colors.white : Colors.grey,
+                                  color: isDarkMode ? Colors.white : Colors.black,
                                 ),
-                                Divider(),
-                                const SizedBox(height: 10),
-                                Obx(() {
-                                  if (_profileGetController.isLoading.value) {
-                                    return CustomLoader();
-                                  } else {
-                                    return Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        StatBox(title: 'Follower', value: _profileGetController.profile.value.data?.followerCount?.toString() ?? "0"),
-                                        StatBox(title: 'Following', value: _profileGetController.profile.value.data?.followCount?.toString() ?? "0"),
-                                        StatBox(title: 'Event', value: _profileGetController.profile.value.data?.events.length.toString() ?? "0"),
-                                      ],
-                                    );
-                                  }
-                                }),
                               ],
                             ),
                           ],
@@ -177,9 +161,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     weight: FontWeight.w500,
                     btnTextColor: isDarkMode ? Colors.white : Colors.black,
                     bgColor: isDarkMode ? Color(0xFF4B515580) : Color(0xFFFFF5F0),
-                    btnText: "Event Create",
+                    btnText: "Edit details",
                     onTap: () {
-                      Get.to(() => CreateEventView());
+                      Get.to(() => MyDetailsView());
                     },
                     iconWant: false,
                   ),
@@ -187,25 +171,24 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
                 const SizedBox(height: 20),
 
-                // Tab Bar
                 TabBar(
                   controller: _tabController,
-                  tabs: [
-                    Tab(text: 'Interested'),
-                    Tab(text: 'My Events'),
-                    Tab(text: 'Private'),
-                  ],
-                  labelColor: isDarkMode ? Colors.white : Colors.grey,
-                  labelStyle: GoogleFonts.poppins(),
-                  unselectedLabelColor: isDarkMode ? Colors.white : Colors.grey,
-                  indicatorColor: Colors.black,
+                  tabs: [Tab(text: 'Interested Events'), Tab(text: 'My Events')],
+                  labelColor: isDarkMode ? Colors.white : Colors.black,
+                  labelStyle: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                  unselectedLabelColor: isDarkMode ? Colors.grey : Colors.grey,
+                  indicatorColor: isDarkMode ? Colors.white : Colors.black,
+                  indicatorSize: TabBarIndicatorSize.tab,
                 ),
                 SizedBox(height: 20),
+
                 SizedBox(
-                  height: max(
-                    (_myInterestedController.nurseData.value.data?.length ?? 0) * 600,
-                    (_getMyEventController.nurseData.value.data?.length ?? 0) * 600,
-                  ),
+                  height:
+                      max(
+                        (_myInterestedController.nurseData.value.data?.length ?? 0) * 450,
+                        (_getMyEventController.nurseData.value.data?.length ?? 0) * 450,
+                      ) +
+                      20,
                   child: TabBarView(
                     physics: NeverScrollableScrollPhysics(),
                     controller: _tabController,
@@ -218,7 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                         final eventList = _myInterestedController.nurseData.value.data ?? [];
 
                         if (eventList.isEmpty) {
-                          return NotFoundWidget(message: "No Create Event found");
+                          return NotFoundWidget(message: "No Interested Events found");
                         }
 
                         return ListView.builder(
@@ -250,6 +233,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                           },
                         );
                       }),
+
                       Obx(() {
                         if (_getMyEventController.isLoading.value) {
                           return const Center(child: CircularProgressIndicator());
@@ -258,7 +242,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                         final eventList = _getMyEventController.nurseData.value.data ?? [];
 
                         if (eventList.isEmpty) {
-                          return NotFoundWidget(message: "No Create Event found");
+                          return NotFoundWidget(message: "No Created Events found");
                         }
 
                         return ListView.builder(
@@ -288,43 +272,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                           },
                         );
                       }),
-                      Obx(() {
-                        if (_getMyEventController.isLoading.value) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
 
-                        final allEvents = _getMyEventController.nurseData.value.data ?? [];
-                        final privateEvents = allEvents.where((e) => e.isPublic == false).toList();
-
-                        if (privateEvents.isEmpty) {
-                          return NotFoundWidget(message: "No Private Event found");
-                        }
-
-                        return ListView.builder(
-                          itemCount: privateEvents.length,
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            final event = privateEvents[index];
-
-                            final interestedPeopleImages = event.interestEvents
-                                .map((interestEvent) => interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png',)
-                                .toList();
-
-                            return EventCard(
-                              eventId: event.id,
-                              image: (event.image != null && event.image!.isNotEmpty) ? event.image.toString() : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
-                              eventName: event.title ?? '',
-                              eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
-                              categories: event.tags,
-                              eventDescription: event.content ?? '',
-                              friendsInterested: event.interestEvents.length,
-                              onTap: () => Get.to(() => EventDetailPage(eventId: event.id!)),
-                              interestedPeopleImage: interestedPeopleImages,
-                            );
-                          },
-                        );
-                      }),
                     ],
                   ),
                 ),
