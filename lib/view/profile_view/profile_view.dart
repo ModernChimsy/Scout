@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_interpolation_to_compose_strings, prefer_const_literals_to_create_immutables, use_full_hex_values_for_flutter_colors
 
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -9,19 +8,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/custom_button_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/no_data_found_widget.dart';
-import 'package:restaurent_discount_app/uitilies/app_colors.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
-import 'package:restaurent_discount_app/view/create_event/create_event_view.dart';
 import 'package:restaurent_discount_app/view/home_view/widget/home_card_widget.dart';
-import 'package:restaurent_discount_app/view/profile_view/controller/event_delete_controller.dart';
 import 'package:restaurent_discount_app/view/profile_view/controller/get_my_event_controller.dart';
 import 'package:restaurent_discount_app/view/profile_view/controller/get_my_interested_event.dart';
 import 'package:restaurent_discount_app/view/profile_view/controller/profile_get_controller.dart';
 import 'package:restaurent_discount_app/view/profile_view/settings_view/account_settings_view.dart';
+import 'package:restaurent_discount_app/view/profile_view/settings_view/my_details_view.dart';
 import 'package:restaurent_discount_app/view/profile_view/widget/profile_shimmer_widget.dart';
-import 'package:restaurent_discount_app/uitilies/custom_loader.dart';
 import 'package:restaurent_discount_app/view/event_details/event_details_view.dart';
-import 'package:restaurent_discount_app/view/public_profile/widget/stats_box_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -34,7 +29,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   late TabController _tabController;
 
   final ProfileGetController _profileGetController = Get.put(ProfileGetController());
-  final EventDeleteController _eventDeleteController = Get.put(EventDeleteController());
   final MyInterstedController _myInterestedController = Get.put(MyInterstedController());
   final GetMyEventController _getMyEventController = Get.put(GetMyEventController());
 
@@ -48,16 +42,13 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       case 1:
         _getMyEventController.getMyEvent();
         break;
-      case 2:
-        _getMyEventController.getMyEvent();
-        break;
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabChange);
 
     _profileGetController.getProfile();
@@ -111,8 +102,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 20),
-
                 Obx(() {
                   return _profileGetController.isLoading.value
                       ? ProfileShimmerWidget()
@@ -123,11 +112,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                             Container(
                               width: 70,
                               height: 70,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white,
-                                border: Border.all(color: AppColors.btnColor, width: 2),
-                              ),
                               child: CircleAvatar(
                                 backgroundImage:
                                     _profileGetController.profile.value.data!.profilePicture.toString().isEmpty ||
@@ -136,27 +120,25 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                                     : NetworkImage(_profileGetController.profile.value.data!.profilePicture.toString()) as ImageProvider,
                               ),
                             ),
-                            const SizedBox(width: 16),
                             SizedBox(height: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            CustomText(
+                              text:
+                                  '${_profileGetController.profile.value.data?.firstName ?? "John"} '
+                                  '${_profileGetController.profile.value.data?.lastName ?? "Doe"}',
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
+                            const SizedBox(height: 5),
+                            CustomText(
+                              italic: FontStyle.italic,
+                              text: '@${_profileGetController.profile.value.data?.lastName ?? "johnnyboi"}',
+                              fontSize: 16,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
                               children: [
-                                CustomText(
-                                  text:
-                                      '${_profileGetController.profile.value.data?.firstName ?? ""} '
-                                      '${_profileGetController.profile.value.data?.lastName ?? ""}',
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDarkMode ? Colors.white : Colors.black,
-                                ),
-                                const SizedBox(height: 5),
-                                CustomText(
-                                  italic: FontStyle.italic,
-                                  text: '@${_profileGetController.profile.value.data?.lastName ?? "user"}',
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                ),
-                                const SizedBox(height: 10),
                                 CustomText(
                                   italic: FontStyle.italic,
                                   text: (_profileGetController.profile.value.data?.bio?.isNotEmpty ?? false)
