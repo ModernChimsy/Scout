@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:restaurent_discount_app/uitilies/app_colors.dart';
 import 'package:restaurent_discount_app/view/bookmarks_view/bookmarks_view.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
-import 'package:restaurent_discount_app/view/create_event/create_event_view.dart';
+import 'package:restaurent_discount_app/view/create_event/select_event_view.dart' show SelectEventView;
 import 'package:restaurent_discount_app/view/home_view/home_view.dart';
 import 'package:restaurent_discount_app/view/profile_view/controller/profile_get_controller.dart';
 import 'package:restaurent_discount_app/view/profile_view/profile_view.dart';
@@ -21,7 +21,13 @@ class BottomNavBarExample extends StatefulWidget {
 class _BottomNavBarExampleState extends State<BottomNavBarExample> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [HomeScreen(), EventCategoryScreen(), CreateEventView(), BookmarksView(), ProfileScreen()];
+  final List<Widget> _pages = [
+    HomeScreen(),
+    EventCategoryScreen(),
+    Container(),
+    BookmarksView(),
+    ProfileScreen(),
+  ];
 
   final ProfileGetController _profileGetController = Get.put(ProfileGetController());
 
@@ -30,9 +36,13 @@ class _BottomNavBarExampleState extends State<BottomNavBarExample> {
   final List<IconData> _activeIcons = const [Icons.home_filled, Icons.search, Icons.add_box_rounded, Icons.bookmark];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    if (index == 2) {
+      Get.to(() => const SelectEventView());
+    } else {
+      setState(() {
+        _currentIndex = index;
+      });
+    }
   }
 
   @override
@@ -89,7 +99,6 @@ class _BottomNavBarExampleState extends State<BottomNavBarExample> {
                   height: 32,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    // Border applied only when active
                     border: _currentIndex == 4 ? Border.all(color: activeItemColor, width: 2) : null,
                   ),
                   child: ClipOval(
