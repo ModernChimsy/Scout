@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:restaurent_discount_app/uitilies/app_colors.dart';
 
 class CustomText extends StatelessWidget {
-  CustomText({
+  const CustomText({
     super.key,
     this.maxLines,
     this.textAlign = TextAlign.center,
