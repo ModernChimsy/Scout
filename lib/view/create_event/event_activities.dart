@@ -9,7 +9,6 @@ import 'package:restaurent_discount_app/uitilies/app_colors.dart';
 import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
-import 'create_event_view.dart';
 
 class EventActivitiesPage extends StatefulWidget {
   const EventActivitiesPage({super.key});
@@ -20,7 +19,6 @@ class EventActivitiesPage extends StatefulWidget {
 
 class _EventActivitiesPageState extends State<EventActivitiesPage> {
   final StorageService _storageService = StorageService();
-  final List<FocusNode> _focusNodes = [];
   List<Map<String, String>> activities = [];
 
   @override
@@ -34,40 +32,17 @@ class _EventActivitiesPageState extends State<EventActivitiesPage> {
     if (savedActivities != null) {
       activities = savedActivities.map<Map<String, String>>((e) => Map<String, String>.from(e)).toList();
     }
-    _initFocusNodes();
-  }
-
-  void _initFocusNodes() {
-    _focusNodes.clear();
-    for (int i = 0; i < activities.length; i++) {
-      final node = FocusNode();
-      node.addListener(() => _onActivityNameFocusChange(node));
-      _focusNodes.add(node);
-    }
     setState(() {});
-  }
-
-  void _onActivityNameFocusChange(FocusNode node) {
-    if (!_focusNodes.any((n) => n.hasFocus)) {
-      Future.delayed(Duration(milliseconds: 100), () {
-        if (mounted) {
-          _saveActivitiesAndExit();
-        }
-      });
-    }
   }
 
   @override
   void dispose() {
-    for (var node in _focusNodes) {
-      node.dispose();
-    }
     super.dispose();
   }
 
   void _saveActivitiesAndExit() {
     if (activities.isEmpty) {
-      Get.to(() => const CreateEventView());
+      Get.back();
       return;
     }
 
@@ -81,24 +56,18 @@ class _EventActivitiesPageState extends State<EventActivitiesPage> {
     _storageService.write('eventActivities', activities);
     CustomToast.showToast("Activities Updated", isError: false);
 
-    Get.to(() => const CreateEventView());
+    Get.back();
   }
 
   void _addActivity() {
     setState(() {
       activities.add({"name": "", "startTime": "", "endTime": ""});
-
-      final newNode = FocusNode();
-      newNode.addListener(() => _onActivityNameFocusChange(newNode));
-      _focusNodes.add(newNode);
     });
-    Future.delayed(Duration(milliseconds: 50), () => FocusScope.of(context).requestFocus(_focusNodes.last));
   }
 
   void _removeActivity(int index) {
     setState(() {
       activities.removeAt(index);
-      _focusNodes.removeAt(index).dispose();
     });
   }
 
@@ -135,7 +104,7 @@ class _EventActivitiesPageState extends State<EventActivitiesPage> {
     bool isDarkMode = Get.find<ThemeController>().selectedTheme == ThemeController.darkTheme;
 
     return Scaffold(
-      appBar: CustomAppBar(title: "Event Activities"),
+      appBar: const CustomAppBar(title: "Event Activities"),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -144,35 +113,38 @@ class _EventActivitiesPageState extends State<EventActivitiesPage> {
               onTap: _addActivity,
               child: Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(14),
-                decoration: BoxDecoration(color: isDarkMode ? Color(0xFF4B515580) : Color(0xFFFFF5F0), borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: isDarkMode ? const Color(0xFF4B515580) : const Color(0xFFFFF5F0),
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.add, color: isDarkMode ? Colors.white : Colors.black),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     CustomText(color: isDarkMode ? Colors.white : Colors.black, text: "Add activity", fontSize: 16, fontWeight: FontWeight.w500),
                   ],
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
                 itemCount: activities.length,
                 itemBuilder: (context, index) {
                   return Container(
-                    margin: EdgeInsets.only(bottom: 16),
-                    padding: EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: isDarkMode ? Colors.black : Colors.white,
                       borderRadius: BorderRadius.circular(8),
                       boxShadow: [
                         BoxShadow(
-                          color: isDarkMode ? Color(0xFF4B515580) : Colors.grey.withOpacity(0.1),
+                          color: isDarkMode ? const Color(0xff4b515580) : Colors.grey.withOpacity(0.1),
                           blurRadius: 1,
                           spreadRadius: 2,
-                          offset: Offset(0, 3),
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -180,7 +152,6 @@ class _EventActivitiesPageState extends State<EventActivitiesPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CustomTextField(
-                          focusNode: _focusNodes.length > index ? _focusNodes[index] : null,
                           hintTextColo: isDarkMode ? Colors.grey : Colors.black,
                           iconColor: Colors.white,
                           fillColor: isDarkMode ? Colors.black : Colors.white,
@@ -193,20 +164,20 @@ class _EventActivitiesPageState extends State<EventActivitiesPage> {
                           },
                           onSubmitted: (_) {
                             if (index < activities.length - 1) {
-                              FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
+                              FocusScope.of(context).nextFocus();
                             } else {
-                              _saveActivitiesAndExit();
+                              FocusScope.of(context).unfocus();
                             }
                           },
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Row(
                           children: [
                             Expanded(
                               child: GestureDetector(
                                 onTap: () => _selectTime(context, index, "startTime"),
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                                   decoration: BoxDecoration(
                                     color: isDarkMode ? Colors.black : Colors.white,
                                     border: Border.all(color: Colors.grey),
@@ -220,12 +191,12 @@ class _EventActivitiesPageState extends State<EventActivitiesPage> {
                                 ),
                               ),
                             ),
-                            SizedBox(width: 12),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: GestureDetector(
                                 onTap: () => _selectTime(context, index, "endTime"),
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                                   decoration: BoxDecoration(
                                     color: isDarkMode ? Colors.black : Colors.white,
                                     border: Border.all(color: Colors.grey),
@@ -241,12 +212,12 @@ class _EventActivitiesPageState extends State<EventActivitiesPage> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         Center(
                           child: TextButton.icon(
                             onPressed: () => _removeActivity(index),
-                            icon: Icon(Icons.delete_outline, color: Colors.red),
-                            label: CustomText(text: "Delete", color: Colors.red),
+                            icon: const Icon(Icons.delete_outline, color: Colors.red),
+                            label: const CustomText(text: "Delete", color: Colors.red),
                           ),
                         ),
                       ],
@@ -260,7 +231,7 @@ class _EventActivitiesPageState extends State<EventActivitiesPage> {
               height: 48.h,
               child: CustomButtonWidget(bgColor: AppColors.btnColor, btnText: "Update", onTap: _saveActivitiesAndExit, iconWant: false),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
           ],
         ),
       ),

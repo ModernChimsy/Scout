@@ -13,7 +13,6 @@ import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/view/create_event/widget/toogle_for_event.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
-import 'create_event_view.dart';
 
 class AgesRestrictionView extends StatefulWidget {
   const AgesRestrictionView({super.key});
@@ -25,7 +24,6 @@ class AgesRestrictionView extends StatefulWidget {
 class _AgesRestrictionViewState extends State<AgesRestrictionView> {
   final TextEditingController ageController = TextEditingController();
   final StorageService _storageService = StorageService();
-  final FocusNode _focusNode = FocusNode();
 
   bool isAgeRestricted = false;
 
@@ -33,26 +31,12 @@ class _AgesRestrictionViewState extends State<AgesRestrictionView> {
   void initState() {
     super.initState();
     _loadSavedValues();
-
-    _focusNode.addListener(_onFocusChange);
   }
 
   @override
   void dispose() {
-    _focusNode.removeListener(_onFocusChange);
-    _focusNode.dispose();
     ageController.dispose();
     super.dispose();
-  }
-
-  void _onFocusChange() {
-    if (!_focusNode.hasFocus) {
-      Future.delayed(Duration(milliseconds: 100), () {
-        if (mounted) {
-          _saveAndExit();
-        }
-      });
-    }
   }
 
   void _loadSavedValues() async {
@@ -88,7 +72,7 @@ class _AgesRestrictionViewState extends State<AgesRestrictionView> {
 
     CustomToast.showToast("Age restriction saved.", isError: false);
 
-    Get.to(() => CreateEventView());
+    Get.back();
   }
 
   @override
@@ -113,7 +97,6 @@ class _AgesRestrictionViewState extends State<AgesRestrictionView> {
               SizedBox(height: 6.h),
               CustomTextField(
                 controller: ageController,
-                focusNode: _focusNode,
                 keyboardType: TextInputType.number,
                 fillColor: Colors.transparent,
                 borderColor: Colors.grey,
@@ -122,7 +105,6 @@ class _AgesRestrictionViewState extends State<AgesRestrictionView> {
                 onSubmitted: (_) => _saveAndExit(),
               ),
               SizedBox(height: 15),
-
               ToggleForEvent(
                 textColor: isDarkMode ? Colors.white : Colors.black,
                 color: isDarkMode ? Color(0xFF4B515580) : Color(0xFFFFF5F0),
@@ -135,7 +117,6 @@ class _AgesRestrictionViewState extends State<AgesRestrictionView> {
                   await _storageService.write('isAgeRestricted', value);
                 },
               ),
-
               Spacer(),
               SizedBox(
                 width: double.infinity,

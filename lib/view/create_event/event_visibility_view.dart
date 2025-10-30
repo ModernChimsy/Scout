@@ -14,7 +14,6 @@ import 'package:restaurent_discount_app/view/create_event/widget/event_card_widg
 import 'package:restaurent_discount_app/view/create_event/widget/toogle_for_event.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
 import '../profile_view/settings_view/invite_user_view.dart';
-import 'create_event_view.dart';
 
 class EventVisibilityView extends StatefulWidget {
   const EventVisibilityView({super.key});
@@ -47,7 +46,7 @@ class _EventVisibilityViewState extends State<EventVisibilityView> {
 
     CustomToast.showToast("Event visibility updated to ${isPrivate ? 'Private' : 'Public'}", isError: false);
 
-    Get.to(() => CreateEventView());
+    Get.back();
   }
 
   @override

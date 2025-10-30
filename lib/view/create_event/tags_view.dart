@@ -11,7 +11,6 @@ import 'package:restaurent_discount_app/uitilies/constant.dart';
 import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
-import 'create_event_view.dart';
 
 class TagsView extends StatefulWidget {
   const TagsView({super.key});
@@ -104,7 +103,7 @@ class _TagsViewState extends State<TagsView> {
     await _storageService.write('selectedTags', tagsString);
     CustomToast.showToast("Tag Saved", isError: false);
 
-    Get.to(() => CreateEventView());
+    Get.back();
   }
 
   @override

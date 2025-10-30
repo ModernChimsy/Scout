@@ -11,7 +11,6 @@ import 'package:restaurent_discount_app/view/create_event/controller/theme_contr
 import 'package:restaurent_discount_app/view/create_event/widget/toogle_for_event.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
 import 'package:restaurent_discount_app/uitilies/custom_toast.dart';
-import 'create_event_view.dart';
 
 class ExtraView extends StatefulWidget {
   const ExtraView({super.key});
@@ -53,7 +52,7 @@ class _ExtraViewState extends State<ExtraView> {
 
       CustomToast.showToast("Extra options saved successfully.");
 
-      Get.to(() => CreateEventView());
+      Get.back();
     } catch (e) {
       CustomToast.showToast("Failed to save options.", isError: true);
     }
