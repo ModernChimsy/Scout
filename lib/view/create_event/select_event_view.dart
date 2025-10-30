@@ -39,7 +39,12 @@ class _SelectEventViewState extends State<SelectEventView> {
   Widget _buildEventOption({required EventType type, required String title, required String price, required List<String> features}) {
     final isSelected = _selectedEventType == type;
 
-    final Color cardColor = isDarkMode ? AppColors.cardBackgroundDark : Colors.white;
+    final Color cardColor;
+    if (isDarkMode) {
+      cardColor = isSelected ? AppColors.selectedDarkCardBg : AppColors.unselectedDarkCardBg;
+    } else {
+      cardColor = isSelected ? AppColors.selectedLightCardBg : AppColors.unselectedLightCardBg;
+    }
 
     final Color unselectedBorderColor = isDarkMode ? Colors.grey.shade700 : Colors.grey.shade400;
     final Color borderColor = isSelected ? AppColors.btnColor : unselectedBorderColor;
@@ -48,9 +53,6 @@ class _SelectEventViewState extends State<SelectEventView> {
 
     final Color corePriceBgColor = Color(0xFFE94E1B);
     final Color priceBgColor = type == EventType.core ? corePriceBgColor : AppColors.btnColor;
-
-    final Color selectedDarkCardColor = Color(0xFF333333);
-    final Color finalCardColor = isSelected && isDarkMode ? selectedDarkCardColor : cardColor;
 
     return GestureDetector(
       onTap: () {
@@ -62,7 +64,7 @@ class _SelectEventViewState extends State<SelectEventView> {
         margin: EdgeInsets.only(bottom: 20.h),
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: finalCardColor,
+          color: cardColor,
           borderRadius: BorderRadius.circular(15),
           border: Border.all(color: isSelected ? AppColors.btnColor : unselectedBorderColor, width: isSelected ? 2.0 : 1.0),
           boxShadow: isSelected && !isDarkMode ? [BoxShadow(color: AppColors.btnColor.withOpacity(0.2), blurRadius: 5, spreadRadius: 1)] : null,
@@ -90,12 +92,14 @@ class _SelectEventViewState extends State<SelectEventView> {
   }
 
   Widget _buildFeatureRow(String text, Color color) {
+    final Color svgColor = isDarkMode ? Colors.white : Colors.black;
+
     return Padding(
       padding: EdgeInsets.only(bottom: 6.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SvgPicture.asset(checkMarkPath, height: 20.h),
+          SvgPicture.asset(checkMarkPath, height: 20.h, colorFilter: ColorFilter.mode(svgColor, BlendMode.srcIn)),
           SizedBox(width: 8.w),
           Expanded(
             child: CustomText(
