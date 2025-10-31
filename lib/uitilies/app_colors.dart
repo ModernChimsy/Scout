@@ -14,7 +14,13 @@ class AppColors {
   static Color cardBackgroundLight = const Color(0xFFF4F4F4);
   static Color cardBackgroundDark = const Color(0xFF25282A);
 
-  /// Category Chip Colors Start: --------------------------------------------------------------------------------------------------------------------
+  /// Event Create:
+  static Color unselectedDarkCardBg = const Color(0x804B5155);
+  static Color selectedDarkCardBg = const Color(0x99742802);
+  static Color unselectedLightCardBg =  const Color(0xFFFFFFFF);
+  static Color selectedLightCardBg = const Color(0xFFFFF5F0);
+
+  /// Category Chip Colors Start:
   /// Nightlife
   static Color nightlifeLight = const Color(0xffcfd6fe);
   static Color nightlifeDark = const Color(0xFF1E1BA9);

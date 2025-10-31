@@ -14,7 +14,6 @@ import 'package:restaurent_discount_app/view/create_event/controller/get_user_co
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
 import '../../common widget/custom text/custom_text_widget.dart';
-import 'create_event_view.dart';
 
 class HideEventPage extends StatefulWidget {
   const HideEventPage({super.key});
@@ -27,7 +26,6 @@ class _HideEventPageState extends State<HideEventPage> {
   final GetUserController controller = Get.put(GetUserController());
   final StorageService _storageService = StorageService();
   final TextEditingController searchController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
 
   List<String> selectedUserIds = [];
   List<dynamic> _filteredUsers = [];
@@ -39,24 +37,10 @@ class _HideEventPageState extends State<HideEventPage> {
     super.initState();
     _loadSelectedUserIds();
     _fetchUsers();
-
-    _focusNode.addListener(_onFocusChange);
-  }
-
-  void _onFocusChange() {
-    if (!_focusNode.hasFocus) {
-      Future.delayed(Duration(milliseconds: 100), () {
-        if (mounted) {
-          _saveAndExit();
-        }
-      });
-    }
   }
 
   @override
   void dispose() {
-    _focusNode.removeListener(_onFocusChange);
-    _focusNode.dispose();
     searchController.dispose();
     super.dispose();
   }
@@ -83,7 +67,6 @@ class _HideEventPageState extends State<HideEventPage> {
         selectedUserIds.remove(id);
       }
     });
-    // TODO: save on every toggle if list is small, but Update button is safer, better for user experience in the future
   }
 
   void _filterUserList(String query) {
@@ -109,7 +92,7 @@ class _HideEventPageState extends State<HideEventPage> {
     _storageService.write('hiddenUserIds', selectedUserIds);
     CustomToast.showToast("Hidden users updated successfully!", isError: false);
 
-    Get.to(() => CreateEventView());
+    Get.back();
   }
 
   @override
@@ -132,17 +115,15 @@ class _HideEventPageState extends State<HideEventPage> {
             SizedBox(height: 6.h),
             CustomTextField(
               controller: searchController,
-              focusNode: _focusNode,
               fillColor: Colors.transparent,
               borderColor: Colors.grey,
               hintText: "Search here...",
               showObscure: false,
               trailingIcon: Icons.search,
               onChanged: _filterUserList,
-              onSubmitted: (_) => _saveAndExit(),
+              onSubmitted: (_) => FocusScope.of(context).unfocus(),
             ),
             SizedBox(height: 20),
-
             isLoading
                 ? Expanded(child: Center(child: CustomLoader()))
                 : Expanded(
@@ -193,7 +174,6 @@ class _HideEventPageState extends State<HideEventPage> {
                             },
                           ),
                   ),
-
             CustomButtonWidget(bgColor: AppColors.btnColor, btnText: "Update", onTap: _saveAndExit, iconWant: false),
             SizedBox(height: 50),
           ],

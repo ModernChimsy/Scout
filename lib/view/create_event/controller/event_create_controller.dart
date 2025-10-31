@@ -12,6 +12,7 @@ import 'package:restaurent_discount_app/uitilies/api/local_storage.dart';
 import 'package:restaurent_discount_app/view/bottom_navigation_bar_view/bottom_navigation_bar_view.dart';
 import 'package:restaurent_discount_app/uitilies/api/base_client.dart';
 import 'package:restaurent_discount_app/auth/token_manager.dart';
+import 'package:restaurent_discount_app/view/create_event/controller/create_event_form_controller.dart';
 
 class EventCreateController extends GetxController {
   static final log = Logger();
@@ -78,8 +79,12 @@ class EventCreateController extends GetxController {
       if (json != null && json['success'] == true) {
         CustomToast.showToast("Event created successfully!");
 
-        final _storageService = Get.find<StorageService>();
-        await _storageService.clearEventCreationData();
+        final storageService = Get.find<StorageService>();
+        await storageService.clearEventCreationData();
+
+        if (Get.isRegistered<CreateEventFormController>()) {
+          Get.find<CreateEventFormController>().clearFormState();
+        }
 
         Get.offAll(
           () => SuccesfullyPageForAll(
@@ -110,8 +115,8 @@ class EventCreateController extends GetxController {
   }) async {
     final uri = Uri.parse(api);
 
-    final TokenManager _tokenManager = TokenManager();
-    String? accessToken = await _tokenManager.getAccessToken();
+    final TokenManager tokenManager = TokenManager();
+    String? accessToken = await tokenManager.getAccessToken();
 
     final request = http.MultipartRequest('POST', uri);
 
