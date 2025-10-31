@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, use_full_hex_values_for_flutter_colors
 
 import 'dart:io';
-
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -71,9 +70,11 @@ class CreateEventView extends StatelessWidget {
                   height: 150,
                   width: double.infinity,
                   child: DottedBorder(
-                    radius: Radius.circular(15),
-                    dashPattern: [8, 9],
-                    color: AppColors.btnColor,
+                    options: RoundedRectDottedBorderOptions(
+                      radius: Radius.circular(15),
+                      dashPattern: [8.0, 9.0],
+                      color: AppColors.btnColor,
+                    ),
                     child: Obx(() {
                       return formController.eventImage.value == null
                           ? Center(

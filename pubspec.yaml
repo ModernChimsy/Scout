@@ -79,6 +79,7 @@ dependencies:
   flutter_location_search: ^2.0.0
   intl:
   logger: ^2.6.1
+  http: ^1.2.2
   flutter_secure_storage: ^9.2.4
 
 

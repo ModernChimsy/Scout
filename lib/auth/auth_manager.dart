@@ -12,36 +12,35 @@ import 'package:restaurent_discount_app/view/splash%20view/welcome_view.dart';
 class AuthManager {
   final log = Logger();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
   final TokenManager _tokenManager = TokenManager();
 
   Future<bool> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        log.d("🧩 Google sign-in was canceled by the user.");
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final String? googleIdToken = googleAuth.idToken;
 
+      if (googleIdToken == null) {
+        log.w("💣 Google User idToken was null. Cannot authenticate.");
         return false;
       }
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+
+      final AuthCredential credential = GoogleAuthProvider.credential(idToken: googleIdToken);
       final UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
       final String? idToken = await userCredential.user?.getIdToken();
 
       if (idToken == null) {
-        log.d("🧩 Failed to get Firebase ID token.");
-
+        log.w("💣 Failed to get Firebase ID token.");
         return false;
       }
       return await _verifyTokenWithBackend(idToken);
     } on FirebaseAuthException catch (e) {
-      Get.snackbar('Authentication Error', 'Firebase error: ${e.message}', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Authentication Error', 'Firebase error, Try Again Later', snackPosition: SnackPosition.BOTTOM);
       return false;
     } catch (e) {
-      Get.snackbar('Authentication Error', 'An unexpected error occurred: $e', snackPosition: SnackPosition.BOTTOM);
-
       log.d("🧩 Google Sign-In Error: $e");
-
+      Get.snackbar('Authentication Error', 'An unexpected error occurred. Contact Admin', snackPosition: SnackPosition.BOTTOM);
       return false;
     }
   }
@@ -65,15 +64,12 @@ class AuthManager {
         return true;
       } else {
         final error = json.decode(response.body)['message'] ?? 'Unknown error';
-
         log.d("🧩 Failed to verify token with backend: ${response.body}");
-
-        Get.snackbar('Login Failed', 'Server error: $error', snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar('Login Failed', 'Try Again Later', snackPosition: SnackPosition.BOTTOM);
         return false;
       }
     } catch (e) {
       log.d(" 🧩Error sending token to backend: $e");
-
       Get.snackbar('Login Failed', 'Could not connect to the server. Please check your network connection.', snackPosition: SnackPosition.BOTTOM);
       return false;
     }

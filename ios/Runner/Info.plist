@@ -22,17 +22,6 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.googleusercontent.apps.51912556571-ds10bmbb98j24pr0op2bco0gi6v80cs6</string>
-			</array>
-		</dict>
-	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -68,5 +57,21 @@
 	</array>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
+
+	<key>GIDClientID</key>
+	<string>51912556571-ds10bmbb98j24pr0op2bco0gi6v80cs6.apps.googleusercontent.com</string>
+
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.51912556571-ds10bmbb98j24pr0op2bco0gi6v80cs6</string>
+			</array>
+		</dict>
+	</array>
+
 </dict>
 </plist>
