@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
-import 'package:restaurent_discount_app/common%20widget/custom_app_bar_widget.dart';
 import 'package:restaurent_discount_app/common%20widget/no_data_found_widget.dart';
 import 'package:restaurent_discount_app/uitilies/constant.dart';
 import 'package:restaurent_discount_app/uitilies/custom_loader.dart';
@@ -14,13 +12,13 @@ import 'package:restaurent_discount_app/view/create_event/controller/theme_contr
 import 'package:restaurent_discount_app/view/event_details/event_details_view.dart';
 import 'package:restaurent_discount_app/view/home_view/widget/home_card_widget.dart';
 import 'package:restaurent_discount_app/view/search_view/controller/filter_controller.dart';
-import 'package:restaurent_discount_app/view/search_view/controller/global_search_controller.dart'; // Import new controller
+import 'package:restaurent_discount_app/view/search_view/controller/global_search_controller.dart';
 import 'package:restaurent_discount_app/view/search_view/controller/location_filter_controller.dart';
-import 'package:restaurent_discount_app/view/search_view/model/user_search_model.dart'; // Import new model
 import 'package:restaurent_discount_app/view/search_view/widget/date_range_widget.dart';
 import 'package:restaurent_discount_app/view/search_view/widget/location_page.dart';
 import 'package:restaurent_discount_app/view/search_view/widget/categories_filter_page.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
+import 'package:restaurent_discount_app/view/search_view/widget/user_search_card.dart';
 
 class SearchDetailsPage extends StatefulWidget {
   final String? tag;
@@ -33,8 +31,6 @@ class SearchDetailsPage extends StatefulWidget {
 }
 
 class _SearchDetailsPageState extends State<SearchDetailsPage> {
-  static final log = Logger();
-
   final FilterController _filterController = Get.find<FilterController>();
   final GlobalSearchController _globalSearchController = Get.put(GlobalSearchController());
   final LocationFilterController _locationFilterController = Get.find<LocationFilterController>();
@@ -365,53 +361,5 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
               );
             },
           );
-  }
-}
-
-// New User Card Widget (as shown in your Figma design)
-class UserSearchCard extends StatelessWidget {
-  static final log = Logger();
-
-  final UserSearchData user;
-  final bool isDarkMode;
-
-  const UserSearchCard({Key? key, required this.user, required this.isDarkMode}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final displayName = user.fullname ?? 'Scout User';
-    final displayUsername = (user.username?.isNotEmpty ?? false) ? user.username : user.firstName;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: GestureDetector(
-        onTap: () {
-          // TODO: Replace with your actual User Profile Page navigation
-          // Example: Get.to(() => UserProfilePage(userId: user.id));
-          log.i("Navigate to user profile for ${user.id}");
-        },
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 25,
-              backgroundImage: NetworkImage(user.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png'),
-            ),
-            SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CustomText(text: displayName, color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
-                  if (displayUsername != null && displayUsername.isNotEmpty) CustomText(text: displayUsername, color: Colors.grey, fontSize: 14),
-                ],
-              ),
-            ),
-            // You can add a "Follow" button here if you like
-            // For now, just a chevron to indicate tap-ability
-            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-          ],
-        ),
-      ),
-    );
   }
 }
