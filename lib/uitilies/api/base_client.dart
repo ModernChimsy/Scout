@@ -3,12 +3,30 @@ import 'dart:io';
 import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:restaurent_discount_app/auth/token_manager.dart';
+import 'package:path_provider/path_provider.dart';
 
 class BaseClient {
   static final log = Logger();
   static var noInternetMessage = "Please check your connection!";
+  static const String _successLogFileName = 'success_api_responses.log';
 
   static final TokenManager _tokenManager = TokenManager();
+
+  static Future<void> _logSuccessBodyToFile(String url, String method, String headers, String body) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/$_successLogFileName');
+
+      final String timestamp = DateTime.now().toIso8601String();
+      final String logEntry = "[$timestamp] \n---\nUrl:$url\nMethod:$method\nHeaders:\n$headers\nSuccess Body:\n$body\n===\n";
+
+      await file.writeAsString(logEntry, mode: FileMode.append);
+
+      log.i("🧩 Success Log written to file ➡️: ${file.path}");
+    } catch (e) {
+      log.e("Failed to write success log to file: $e");
+    }
+  }
 
   static Future<http.Response> getRequest({required String api, Map<String, dynamic>? params}) async {
     final String? accessToken = await _tokenManager.getAccessToken();
@@ -98,12 +116,17 @@ class BaseClient {
     return response;
   }
 
-  static handleResponse(http.Response response) async {
-    log.i("ℹ️ Processing Response: Status ${response.statusCode}");
+  static Future<dynamic> handleResponse(http.Response response) async {
+    log.i("Processing Response: Status ${response.statusCode}");
 
     try {
       if (response.statusCode >= 200 && response.statusCode <= 210) {
-        log.d('✅ Success Body: ${response.body}');
+        await _logSuccessBodyToFile(
+          response.request!.url.toString(),
+          response.request!.method.toString(),
+          response.request!.headers.toString(),
+          response.body,
+        );
 
         if (response.body.isNotEmpty) {
           return json.decode(response.body);
