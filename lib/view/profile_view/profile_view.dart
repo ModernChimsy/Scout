@@ -125,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                               text:
                                   '${_profileGetController.profile.value.data?.firstName ?? "John"} '
                                   '${_profileGetController.profile.value.data?.lastName ?? "Doe"}',
-                              fontSize: 22,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: isDarkMode ? Colors.white : Colors.black,
                             ),

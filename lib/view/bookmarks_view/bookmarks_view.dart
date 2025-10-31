@@ -108,7 +108,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                     final bookmarkedEvents = box.values.toList();
 
                     if (bookmarkedEvents.isEmpty) {
-                      return Center(child: NotFoundWidget(message: 'No bookmarks data found'));
+                      return Center(child: NotFoundWidget(message: 'No saved events'));
                     }
 
                     return ListView.builder(
