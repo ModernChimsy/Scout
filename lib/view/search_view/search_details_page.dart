@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:restaurent_discount_app/common%20widget/no_data_found_widget.dart';
+import 'package:restaurent_discount_app/uitilies/app_colors.dart';
 import 'package:restaurent_discount_app/uitilies/constant.dart';
 import 'package:restaurent_discount_app/uitilies/custom_loader.dart';
 import 'package:restaurent_discount_app/view/bookmarks_view/widget/top_widget_bookmarks.dart';
@@ -143,7 +144,6 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
 
       PreferredSizeWidget appBarWidget = AppBar(
         systemOverlayStyle: systemOverlayStyle,
-        forceMaterialTransparency: true,
         automaticallyImplyLeading: false,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: isDarkMode ? Colors.white : Colors.black, size: 20),
@@ -151,19 +151,19 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
         ),
         title: CustomText(text: appBarTitle, color: isDarkMode ? Colors.white : Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: isDarkMode ? Colors.black : Colors.white,
       );
 
       return Scaffold(
-        backgroundColor: isDarkMode ? Colors.black : Colors.white,
+        backgroundColor: isDarkMode ? AppColors.mainBackgroundDark : AppColors.mainBackgroundLight,
         appBar: appBarWidget,
-        body: Padding(
-          padding: AppPadding.bodyPadding,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(height: 20),
-              SingleChildScrollView(
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              color: isDarkMode ? Colors.black : Colors.white,
+              padding: EdgeInsets.fromLTRB(AppPadding.bodyPadding.left, 20, AppPadding.bodyPadding.right, 20),
+              child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
@@ -198,7 +198,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                       },
                       title: selectedDateRange != null ? 'Date: ${DateFormat('MMM d').format(selectedDateRange!.start)}' : 'Date',
                       iconData: Icons.calendar_month,
-                      bgColor: isDarkMode ? Color(0xFF4B515580) : Color(0xFFF4F4F4),
+                      bgColor: isDarkMode ? AppColors.topWidgetBookmarkDark : AppColors.topWidgetBookmarkLight,
                       textColor: isDarkMode ? Colors.white : Colors.black,
                     ),
                     SizedBox(width: 20),
@@ -233,7 +233,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                       },
                       title: categoryButtonTitle,
                       iconData: Icons.menu,
-                      bgColor: isDarkMode ? Color(0xFF4B515580) : Color(0xFFF4F4F4),
+                      bgColor: isDarkMode ? AppColors.topWidgetBookmarkDark : AppColors.topWidgetBookmarkLight,
                       textColor: isDarkMode ? Colors.white : Colors.black,
                     ),
                     SizedBox(width: 20),
@@ -249,23 +249,27 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                         },
                         title: getLocationButtonTitle(_locationFilterController.selectedLocationName.value),
                         iconData: Icons.location_on_outlined,
-                        bgColor: isDarkMode ? Color(0xFF4B515580) : Color(0xFFF4F4F4),
+                        bgColor: isDarkMode ? AppColors.topWidgetBookmarkDark : AppColors.topWidgetBookmarkLight,
                         textColor: isDarkMode ? Colors.white : Colors.black,
                       );
                     }),
                   ],
                 ),
               ),
-              SizedBox(height: 20),
-              Expanded(child: isGlobalSearch ? Obx(() => _buildGlobalResults(isDarkMode)) : Obx(() => _buildEventOnlyResults(isDarkMode))),
-            ],
-          ),
+            ),
+            SizedBox(height: 20),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: AppPadding.bodyPadding.left),
+                child: isGlobalSearch ? Obx(() => _buildGlobalResults(isDarkMode)) : Obx(() => _buildEventOnlyResults(isDarkMode)),
+              ),
+            ),
+          ],
         ),
       );
     });
   }
 
-  // New Widget for showing combined User and Event results
   Widget _buildGlobalResults(bool isDarkMode) {
     if (_globalSearchController.isLoading.value) {
       return Center(child: CustomLoader());
@@ -294,10 +298,13 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
               itemCount: users.length,
               itemBuilder: (_, index) {
                 final user = users[index];
-                return UserSearchCard(user: user, isDarkMode: isDarkMode);
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: UserSearchCard(user: user, isDarkMode: isDarkMode),
+                );
               },
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 4),
           ],
           if (events.isNotEmpty) ...[
             Padding(
@@ -313,16 +320,20 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                 final interestedPeopleImages = event.interestEvents
                     .map((interestEvent) => interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png')
                     .toList();
-                return EventCard(
-                  eventId: event.id,
-                  image: event.image?.isNotEmpty == true ? event.image.toString() : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
-                  eventName: event.title ?? '',
-                  eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
-                  categories: event.tags,
-                  eventDescription: event.content ?? '',
-                  friendsInterested: event.interestEvents.length,
-                  onTap: () => Get.to(() => EventDetailPage(eventId: event.id)),
-                  interestedPeopleImage: interestedPeopleImages,
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: EventCard(
+                    eventId: event.id,
+                    image: event.image?.isNotEmpty == true ? event.image.toString() : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
+                    eventName: event.title ?? '',
+                    eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
+                    categories: event.tags,
+                    eventDescription: event.content ?? '',
+                    friendsInterested: event.interestEvents.length,
+                    onTap: () => Get.to(() => EventDetailPage(eventId: event.id)),
+                    interestedPeopleImage: interestedPeopleImages,
+                  ),
                 );
               },
             ),
@@ -332,7 +343,6 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
     );
   }
 
-  // This is the original results list, now dedicated to event-only searches
   Widget _buildEventOnlyResults(bool isDarkMode) {
     return _filterController.isLoading.value
         ? Center(child: CustomLoader())
@@ -348,16 +358,19 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                   .map((interestEvent) => interestEvent.user?.profilePicture ?? 'https://d29ragbbx3hr1.cloudfront.net/placeholder_profile.png')
                   .toList();
 
-              return EventCard(
-                eventId: event.id,
-                image: event.image?.isNotEmpty == true ? event.image.toString() : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
-                eventName: event.title ?? '',
-                eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
-                categories: event.tags,
-                eventDescription: event.content ?? '',
-                friendsInterested: event.interestEvents.length,
-                onTap: () => Get.to(() => EventDetailPage(eventId: event.id)),
-                interestedPeopleImage: interestedPeopleImages,
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: EventCard(
+                  eventId: event.id,
+                  image: event.image?.isNotEmpty == true ? event.image.toString() : 'https://d29ragbbx3hr1.cloudfront.net/placeholder.png',
+                  eventName: event.title ?? '',
+                  eventDate: event.date?.toLocal().toString().split(' ')[0] ?? '',
+                  categories: event.tags,
+                  eventDescription: event.content ?? '',
+                  friendsInterested: event.interestEvents.length,
+                  onTap: () => Get.to(() => EventDetailPage(eventId: event.id)),
+                  interestedPeopleImage: interestedPeopleImages,
+                ),
               );
             },
           );

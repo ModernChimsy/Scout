@@ -18,7 +18,8 @@ class CustomText extends StatelessWidget {
     this.overflow = TextOverflow.fade,
     this.letterSpace,
     this.italic,
-    this.decoration, this.decorationColor,
+    this.decoration,
+    this.decorationColor,
   });
 
   final double left;
@@ -41,8 +42,7 @@ class CustomText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:
-          EdgeInsets.only(left: left, right: right, top: top, bottom: bottom),
+      padding: EdgeInsets.only(left: left, right: right, top: top, bottom: bottom),
       child: Text(
         textAlign: textAlign,
         text,

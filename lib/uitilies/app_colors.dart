@@ -3,16 +3,28 @@ import 'package:get/get.dart';
 import 'package:restaurent_discount_app/view/create_event/controller/theme_controller.dart';
 
 class AppColors {
-  static Color scoutVividVermilion = const Color(0xFFFB6012); // using this as the main color across app
-  static Color mainColor = const Color(0xFF0065FF);
+  static Color mainBackgroundLight = const Color(0xFFF4F4F4);
+  static Color mainBackgroundDark = const Color(0xFF000000);
+
+  static Color cardBackgroundLight = const Color(0xFFFFFFFF);
+  static Color cardBackgroundDark = const Color(0xFF121315);
+
   static Color tabActiveColorLight = const Color(0xFFFB6012);
-  static Color tabInActiveColorLight = const Color(0xFFFFF5F0);
   static Color tabActiveColorDark = const Color(0xFFFDAF88);
+
+  static Color tabInActiveColorLight = const Color(0xFFFFF5F0);
   static Color tabInActiveColorDark = const Color(0x804B5155);
+
+  static Color btnColorLight = const Color(0xFFFFF5F0);
+  static Color btnColorDark = const Color(0xFF742802);
+
+  static Color topWidgetBookmarkLight = const Color(0xFFF4F4F4);
+  static Color topWidgetBookmarkDark = const Color(0x804B5155);
+
+  static Color scoutVividVermilion = const Color(0xFFFB6012);
+  static Color mainColor = const Color(0xFF0065FF);
   static Color btnColor = const Color(0xFFFB6012);
   static Color btnBorderColor = const Color(0xFF050505);
-  static Color cardBackgroundLight = const Color(0xFFF4F4F4);
-  static Color cardBackgroundDark = const Color(0xFF25282A);
 
   /// Event Create:
   static Color unselectedDarkCardBg = const Color(0x804B5155);
