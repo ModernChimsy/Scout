@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
-import 'package:restaurent_discount_app/common%20widget/custom_button_widget.dart';
 import 'package:restaurent_discount_app/uitilies/app_colors.dart';
 import 'package:restaurent_discount_app/common%20widget/custom%20text/custom_text_widget.dart';
+import 'package:restaurent_discount_app/view/public_profile/public_profile_view.dart';
 import 'package:restaurent_discount_app/view/search_view/model/user_search_model.dart';
 
 class UserSearchCard extends StatelessWidget {
@@ -14,9 +15,7 @@ class UserSearchCard extends StatelessWidget {
   const UserSearchCard({super.key, required this.user, required this.isDarkMode});
 
   void _navigateToProfile() {
-    // TODO: Replace with your actual User Profile Page navigation
-    // Example: Get.to(() => UserProfilePage(userId: user.id));
-    log.i("🧩 Navigate to user profile for ${user.id}");
+    Get.to(() => PublicProfile(userId: user.id), id: 1);
   }
 
   @override
@@ -27,7 +26,7 @@ class UserSearchCard extends StatelessWidget {
     final fullName = user.fullname ?? 'Full Name Not Found';
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4.0), // Gap between cards
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
       decoration: BoxDecoration(
         color: isDarkMode ? AppColors.cardBackgroundDark : AppColors.cardBackgroundLight,
@@ -67,8 +66,7 @@ class UserSearchCard extends StatelessWidget {
 
           ElevatedButton(
             onPressed: () {
-              log.i("Follow button tapped for user ${user.id} ($username)");
-              // TODO: Implement follow/unfollow logic here
+              Get.to(() => PublicProfile(userId: user.id), id: 1);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: isDarkMode ? AppColors.btnColorDark : AppColors.btnColorLight,
@@ -79,14 +77,9 @@ class UserSearchCard extends StatelessWidget {
             ),
             child: Text(
               "Follow",
-              style: TextStyle(
-                color: isDarkMode ? Colors.white : Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
             ),
           ),
-          // --- 💡 END OF FIX ---
         ],
       ),
     );
