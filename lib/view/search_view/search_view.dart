@@ -32,7 +32,7 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
   void _handleSearchSubmit(String query) {
     final trimmedQuery = query.trim();
     if (trimmedQuery.isNotEmpty) {
-      Get.to(() => SearchDetailsPage(searchQuery: trimmedQuery));
+      Get.to(() => SearchDetailsPage(searchQuery: trimmedQuery), id: 1);
     }
   }
 
@@ -94,7 +94,7 @@ class _EventCategoryScreenState extends State<EventCategoryScreen> {
                     final category = categories[index];
                     return GestureDetector(
                       onTap: () {
-                        Get.to(() => SearchDetailsPage(tag: category.name));
+                        Get.to(() => SearchDetailsPage(tag: category.name), id: 1);
                       },
                       child: EventCategoryCard(category: category),
                     );

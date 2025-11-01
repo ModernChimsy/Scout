@@ -22,11 +22,56 @@ class _BottomNavBarExampleState extends State<BottomNavBarExample> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    HomeScreen(),
-    EventCategoryScreen(),
+    // 0: Home
+    Navigator(
+      key: Get.nestedKey(0),
+      initialRoute: '/',
+      onGenerateRoute: (settings) {
+        if (settings.name == '/') {
+          return GetPageRoute(page: () => HomeScreen());
+        }
+        return null;
+      },
+    ),
+
+    // 1: Search
+    Navigator(
+      key: Get.nestedKey(1),
+      initialRoute: '/',
+      onGenerateRoute: (settings) {
+        if (settings.name == '/') {
+          return GetPageRoute(page: () => EventCategoryScreen());
+        }
+        return null;
+      },
+    ),
+
+    // 2: Create (dummy page)
     Container(),
-    BookmarksView(),
-    ProfileScreen(),
+
+    // 3: Bookmarks
+    Navigator(
+      key: Get.nestedKey(3),
+      initialRoute: '/',
+      onGenerateRoute: (settings) {
+        if (settings.name == '/') {
+          return GetPageRoute(page: () => BookmarksView());
+        }
+        return null;
+      },
+    ),
+
+    // 4: Profile
+    Navigator(
+      key: Get.nestedKey(4),
+      initialRoute: '/',
+      onGenerateRoute: (settings) {
+        if (settings.name == '/') {
+          return GetPageRoute(page: () => ProfileScreen());
+        }
+        return null;
+      },
+    ),
   ];
 
   final ProfileGetController _profileGetController = Get.put(ProfileGetController());
@@ -65,7 +110,6 @@ class _BottomNavBarExampleState extends State<BottomNavBarExample> {
             onTap: _onItemTapped,
             selectedItemColor: Colors.transparent,
             unselectedItemColor: Colors.transparent,
-
             type: BottomNavigationBarType.fixed,
             showSelectedLabels: false,
             showUnselectedLabels: false,
@@ -77,21 +121,25 @@ class _BottomNavBarExampleState extends State<BottomNavBarExample> {
                 icon: Icon(_currentIndex == 0 ? _activeIcons[0] : _regularIcons[0], color: _currentIndex == 0 ? activeItemColor : itemColor),
                 label: '',
               ),
+
               // 1: Search (Icons Array Index 1)
               BottomNavigationBarItem(
                 icon: Icon(_currentIndex == 1 ? _activeIcons[1] : _regularIcons[1], color: _currentIndex == 1 ? activeItemColor : itemColor),
                 label: '',
               ),
+
               // 2: Create Event (Icons Array Index 2)
               BottomNavigationBarItem(
                 icon: Icon(_currentIndex == 2 ? _activeIcons[2] : _regularIcons[2], color: _currentIndex == 2 ? activeItemColor : itemColor),
                 label: '',
               ),
+
               // 3: Bookmarks (Icons Array Index 3)
               BottomNavigationBarItem(
                 icon: Icon(_currentIndex == 3 ? _activeIcons[3] : _regularIcons[3], color: _currentIndex == 3 ? activeItemColor : itemColor),
                 label: '',
               ),
+
               // 4: Profile
               BottomNavigationBarItem(
                 icon: Container(

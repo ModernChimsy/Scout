@@ -145,12 +145,14 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
       PreferredSizeWidget appBarWidget = AppBar(
         systemOverlayStyle: systemOverlayStyle,
         automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: isDarkMode ? Colors.white : Colors.black, size: 20),
-          onPressed: () => Get.back(),
+        title: CustomText(
+          text: appBarTitle,
+          textAlign: TextAlign.left,
+          color: isDarkMode ? Colors.white : Colors.black,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
         ),
-        title: CustomText(text: appBarTitle, color: isDarkMode ? Colors.white : Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
-        centerTitle: true,
+        centerTitle: false,
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
       );
 
@@ -331,7 +333,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                     categories: event.tags,
                     eventDescription: event.content ?? '',
                     friendsInterested: event.interestEvents.length,
-                    onTap: () => Get.to(() => EventDetailPage(eventId: event.id)),
+                    onTap: () => Get.to(() => EventDetailPage(eventId: event.id), id: 1),
                     interestedPeopleImage: interestedPeopleImages,
                   ),
                 );
@@ -368,7 +370,7 @@ class _SearchDetailsPageState extends State<SearchDetailsPage> {
                   categories: event.tags,
                   eventDescription: event.content ?? '',
                   friendsInterested: event.interestEvents.length,
-                  onTap: () => Get.to(() => EventDetailPage(eventId: event.id)),
+                  onTap: () => Get.to(() => EventDetailPage(eventId: event.id), id: 1),
                   interestedPeopleImage: interestedPeopleImages,
                 ),
               );
